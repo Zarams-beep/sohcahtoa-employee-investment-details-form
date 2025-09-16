@@ -1,26 +1,69 @@
-@import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Open+Sans:wght@400;500;600;700&family=EB+Garamond:wght@400;500;600;700&family=Crimson+Pro:wght@400;500;600;700&family=Great+Vibes&family=Poppins:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap");
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  scrollbar-width: none;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+*,
+*::after,
+*::before {
+  @apply m-0 p-0 box-border scroll-smooth;
+  -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* body styling starts */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  @apply relative bg-[url('/SH-logo.png')] text-text h-screen w-screen;
+  background-attachment: fixed;
+  background-size: cover;
+background-position: center 30%;
+image-rendering: auto;
+}
+
+.main-form-container {
+  @apply flex flex-col items-center justify-center w-screen h-screen overflow-hidden;
+  min-height: 100vh;
+}
+.main-form-img-container{
+  @apply hidden md:flex absolute inset-0 bg-cover bg-center overflow-hidden
+}
+.sub-main-form-img-container{
+  @apply absolute inset-0 bg-cover bg-center;
+}
+.overlay{
+  @apply absolute inset-0 bg-black/40 z-[1] overflow-hidden
+}
+.container {
+  @apply relative z-[2] max-w-3xl w-full py-0 sm:py-8 px-5 bg-background shadow-xl overflow-x-hidden;
+}
+.container {
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: #f7f7f7 #f7f7f7; /* thumb + track */
+}
+
+/* Chrome, Edge, Safari */
+.container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.container::-webkit-scrollbar-track {
+  background: #f7f7f7;
+  border-radius: 10px;
+}
+
+.container::-webkit-scrollbar-thumb {
+  background: #f7f7f7; /* orange */
+  border-radius: 10px;
+}
+
+.container::-webkit-scrollbar-thumb:hover {
+  background: #f7f7f7; /* darker orange on hover */
 }

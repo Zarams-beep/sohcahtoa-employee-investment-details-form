@@ -1,11 +1,12 @@
 "use client";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence, easeInOut, easeOut, easeIn } from "framer-motion";
-import FormProps from "@/component/formProps";
-
+import ThankYouPage from "@/component/ThankYou";
+import { Suspense } from "react";
+import "@/styles/form.css";
 const images = [
-  "/2148761771.jpg",
-  "/2149057714.jpg",
+  "/r4.jpg",
+  "/s2-co2py.jpg",
   "/r2.jpg",
   "/r3.jpg",
 ];
@@ -46,7 +47,7 @@ const aliveMotions = [
   { scale: [1, 1.02, 1], rotate: [0, -0.5, 0] },
 ];
 
-export default function HomeForm() {
+export default function ThankYou() {
   const [currentImage, setCurrentImage] = useState(0);
 
   useEffect(() => {
@@ -79,7 +80,7 @@ export default function HomeForm() {
           >
             {/* Alive effect */}
             <motion.div
-              className=""
+              className="absolute inset-0"
               animate={alive}
               transition={{
                 duration: 8,
@@ -96,7 +97,8 @@ export default function HomeForm() {
 
       {/* Form */}
       <div className="container">
-        <FormProps />
+        <Suspense fallback={<div>Loading...</div>}>
+        <ThankYouPage/></Suspense>
       </div>
     </div>
   );

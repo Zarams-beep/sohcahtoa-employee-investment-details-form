@@ -1,0 +1,323 @@
+/* main form styling star */
+.main-form-btn{
+  @apply w-full flex items-center justify-between px-4 py-5 bg-[#e6e6e7] rounded-md text-text font-primary font-medium text-[13px]
+}
+.main-form-btn span{
+  @apply text-[15px] font-primary
+}
+.main-form-btn .arrow-form-icon{
+  @apply text-[30px]
+}
+/* .first-main-form-container{
+  @apply flex flex-col gap-8;
+} */
+.form-container {
+  @apply flex flex-col gap-5;
+}
+.form-container .header-1 {
+  @apply flex flex-col items-center;
+}
+.form-container .header-1 .img-container {
+  @apply w-[130px] sm:w-[200px] h-[80px] sm:h-[100px];
+}
+.form-container .header-1 .img-container img {
+  @apply h-full w-full;
+}
+.form-container .header-1 h1 {
+  @apply text-[1.5rem] sm:text-[2rem] text-mutedGray font-primary font-semibold text-center;
+}
+
+/* section 2 styling ends */
+
+/* form input styling starts */
+.form, form {
+  @apply flex flex-col gap-10;
+}
+.error-line {
+  @apply border-b border-b-[#a00606];
+}
+.star-icon {
+  @apply text-[#a00606] text-[10px] sm:text-[12px] absolute top-0 right-2;
+}
+.overall-form-sub{
+  @apply flex flex-col gap-[2.5rem] mt-5
+}
+.sub-section-container{
+  @apply flex flex-col gap-1 relative;
+}
+.sub-section-container h4, .sub-input-container-unique h4{
+  @apply font-primary text-[14px];
+}
+.sub-section-container .sub-input-container, .sub-input-container-unique{
+  @apply grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-2 relative;
+}
+.sub-input-container-unique-2{
+  @apply grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] md:grid-cols-[repeat(auto-fit,minmax(100px,1fr))] gap-2 relative;
+}
+.sub-input-container-unique-2 span{
+  @apply flex flex-col gap-1;
+}
+span h5{
+  @apply text-[13px] text-mutedGray3
+}
+.sub-input-container-unique .custom-calendar {
+  @apply bg-white border border-gray-300 rounded-lg shadow-md;
+}
+
+.sub-input-container-unique .react-datepicker__day--selected,
+.sub-input-container-unique .react-datepicker__day--keyboard-selected {
+  @apply bg-primary text-white rounded-full;
+}
+
+.sub-section-container .sub-input-container div, .sub-input-container-unique .sub-span{
+  @apply flex flex-col gap-1 w-full
+}
+.sub-section-container input, .sub-section-container select,textarea, .date-input, .open-signature-btn, .signature-input{
+  @apply border border-mutedGray3 rounded-lg px-3 py-2  mt-1 text-mutedGray sm:text-[15px] text-[13px] placeholder:text-mutedGray bg-transparent w-full
+transition-all duration-300;
+}
+.radio-group label{
+  @apply flex items-center w-[3rem]
+}
+.radio-group label input{
+  @apply border-none p-0 cursor-pointer
+}
+.radio-group label input:hover{
+  box-shadow: none;
+  /* border-color: ; */
+}
+.radio-group label input:focus-within{
+  box-shadow: none;
+  /* border-color: ; */
+}
+.date-input {
+  @apply flex items-center justify-between cursor-pointer h-[2rem] w-full;
+}
+.date-input input {
+  @apply border-none focus:ring-0 w-full self-start;
+}
+textarea{
+  @apply h-[10rem]
+}
+.sub-section-container input:hover, .sub-section-container select:hover, textarea:hover{
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+  border-color: #3b82f6;
+}
+.sub-section-container input:focus-within, .sub-section-container select:focus-within, textarea:focus-within{
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4);
+  border-color: #2563eb;
+}
+/* .error-style {
+  @apply border border-[#a00606] focus:outline-none focus:ring-1 focus:ring-[#a00606];
+} */
+.error-message {
+  @apply text-[#a00606] text-[13px] flex items-center gap-[2px] mt-1 w-full;
+}
+
+/* table styling starts */
+.table-container {
+  @apply mt-3 flex flex-col gap-5 ;
+}
+.table-container h4{
+  @apply  font-primary relative;
+}
+.table-container .star-icon {
+  @apply text-[#a00606] text-[10px] sm:text-[12px] absolute top-0 left-[9rem];
+}
+.table-container .error-message {
+  @apply text-[#a00606] text-[13px];
+}
+.table-sub-container{
+  @apply overflow-auto w-full
+}
+table {
+  @apply min-w-full border-separate;
+  border-spacing: 0;
+}
+
+.table-sub-container{
+  @apply overflow-auto w-full
+}
+
+thead tr {
+  @apply text-left w-full;
+}
+.tr-showing-part {
+  @apply bg-[#e5eaf4] p-3 border border-[#c3cad8] font-primary text-[12px] sm:text-[14px] text-mutedGray font-semibold uppercase;
+}
+.tr-showing-part:nth-child(2) {
+  border-top-left-radius: 0.5rem;
+}
+.tr-showing-part:last-child {
+  border-top-right-radius: 0.5rem;
+}
+/* tbody{
+    @apply bg-background
+} */
+.tbody-side {
+  @apply py-4 px-1 sm:px-3 border border-[#c3cad8] text-[10px] sm:text-[14px] font-primary font-thin text-mutedGray flex-wrap;
+}
+.tbody-side input, .tbody-side select{
+  @apply bg-transparent outline-none border-none;
+}
+.table-button-container{
+  @apply flex items-center gap-2;
+}
+.table-button-container button{
+  @apply px-2 py-1 text-[16px] font-bold self-center bg-mutedGray text-mutedGray3 rounded-lg;
+}
+.table-button-container .table-add-btn{
+  @apply bg-primary text-background;
+}
+/* table styling ends */
+/* submit button styling starts */
+.btn-container{
+  @apply flex items-center justify-center gap-2
+}
+.submit-button {
+  @apply w-[10rem] text-background py-2 rounded-lg transition disabled:bg-mutedGray3  disabled:hover:bg-mutedGray3 bg-primary  hover:bg-primary self-center;
+}
+.back-btn{
+  @apply bg-mutedGray3 text-text
+}
+/* submit button styling ends */
+
+/*thank you styling starts */
+.thank-you-container {
+  @apply rounded-lg text-center;
+}
+.thank-you-container h1 {
+  @apply text-[30px] text-center font-bold font-primary text-mutedGray;
+}
+.thank-you-container p {
+  @apply text-[14px] text-mutedGray font-primary;
+}
+.thank-you-sub-container {
+  @apply flex justify-center gap-4;
+}
+.thank-you-sub-container button {
+  @apply bg-primary text-mutedGray self-center p-2 text-[14px] font-primary hover:bg-primary/20 rounded-md;
+}
+.thank-you-sub-container button:last-child {
+  @apply bg-mutedGray3 text-mutedGray hover:bg-mutedGray2;
+}
+/* thank you styling ends */
+
+/* signature-prop styling starts */
+.signature-prop {
+  @apply p-0 m-0 relative;
+}
+.open-signature-btn {
+  @apply  flex items-end justify-end cursor-pointer h-[2rem] w-full bg-transparent;
+}
+.open-signature-btn img {
+  @apply h-full max-h-8 object-contain;
+}
+/* .signature-text-preview {
+  @apply truncate;
+} */
+.modal-overlay {
+  @apply fixed inset-0 flex items-center justify-center bg-black/50 z-50 overflow-y-auto;
+}
+
+.signature-modal {
+  @apply bg-background p-6 rounded-2xl shadow-xl w-[32rem] max-w-full flex flex-col gap-5 mt-[6.5rem];
+}
+.modal-header{
+  @apply flex items-center justify-between mb-2 pb-2 border-b border-b-mutedGray
+}
+.modal-header h2{
+  @apply text-[18px] font-bold font-Classic
+}
+.modal-header button{
+  @apply w-[25px] h-[25px] rounded-full bg-mutedGray3 text-[16px] flex items-center justify-center;
+}
+.mode-toggle{
+  @apply flex items-center justify-center gap-2 mb-3
+}
+.mode-btn{
+  @apply bg-mutedGray3 text-text hover:bg-primary hover:text-background p-2 text-[14px] rounded-md;
+}
+.mode-toggle .active{
+  @apply bg-primary text-background;
+}
+.color-palette{
+  @apply flex items-center gap-1 justify-between w-full
+}
+.color-sub-palette{
+  @apply flex items-center gap-2;
+}
+.clear-btn, .modal-footer button{
+  @apply px-3 py-1 rounded text-sm bg-[#a00606] text-background tracking-wide
+}
+.file-actions{
+  @apply mt-4 flex items-center gap-3
+}
+.file-actions button{
+  @apply flex items-center gap-1 px-2 py-1 text-sm border rounded;
+}
+.modal-footer{
+  @apply flex gap-3 items-center
+}
+.modal-footer .use{
+  @apply bg-mutedGray3 text-text ;
+}
+.file-actions .remove{
+  @apply bg-[#a00606] text-background
+}
+/* signature-prop styling ends */
+
+/* modal styling starts */
+.sub-modal-overlay{
+  @apply flex flex-col gap-2
+}
+.sub-modal-overlay h3{
+  @apply text-[18px] font-semibold font-primary;
+}
+.understand{
+  @apply text-[16px] text-text leading-relaxed tracking-wide;
+}
+.confirm{
+  @apply px-4 py-2 self-center bg-primary text-white rounded-md
+}
+/* modal styling ends */
+
+/* image styling starts */
+.main-img-props-container {
+  @apply flex flex-col gap-1 py-3 px-4 rounded-lg hover:cursor-pointer;
+}
+.file-selected {
+  @apply bg-onFocusBG py-3 px-4 rounded-lg;
+}
+.img-props-container {
+  @apply border border-dashed border-mutedGray3 w-full flex flex-col justify-center items-center rounded-lg mt-1 py-5;
+}
+.input-image-props {
+  @apply border-none hidden;
+}
+.file-container {
+  @apply flex flex-col justify-center items-center;
+}
+.cloud-icon {
+  @apply text-mutedGray3 text-[25px] sm:text-[35px];
+}
+.browse-file {
+  @apply text-[15px] sm:text-[18px] font-primary font-semibold text-mutedGray mt-1;
+}
+.sub-cloud {
+  @apply text-[12px] sm:text-[14px] font-primary text-[#686868] font-thin;
+}
+.drag-over {
+  /* @apply bg-[green]; */
+}
+.display-file-wrapper {
+  @apply flex items-center justify-between gap-2 mt-1;
+}
+.display-file {
+  @apply text-[12px] sm:text-[14px] font-primary text-mutedGray font-thin bg-[#bac9f2] w-full p-2 rounded-md;
+}
+.delete-icon {
+  @apply text-mutedGray text-[16px] sm:text-[20px] hover:text-red-900;
+}
+
+/* image styling ends */
