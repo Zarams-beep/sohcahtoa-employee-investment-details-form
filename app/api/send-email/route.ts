@@ -293,9 +293,42 @@ const excelBuffer = XLSX.write(wb, { type: "buffer", bookType: "xlsx" });
     );
 
     if (body.email) {
-      const userHtml = `<p>Hello ${safefirstName},</p><p>Thank you for your submission. Your files have been recorded.</p>`;
+      const userHtml = `
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f16024;padding:20px 0;font-family:Arial,sans-serif;border:1px border-color:#d7d8e1">
+  <tr>
+    <td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:6px;overflow:hidden;">
+        <tr>
+          <td style="background:#f16024;color:#ffffff;padding:30px;font-size:25px;font-weight:bold;text-align:center;">
+            SOHCAHTOA
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:30px;color:#333333;font-size:16px;line-height:1.6;">
+            <p style="margin:0 0 16px 0;">Hi ${safefirstName},</p>
+            <p style="margin:0 0 16px 0;">
+              Thank you for your submission. Your files have been recorded.
+            </p>
+            <div style="background-color:#f4b192; display:flex; justify-content: center;align-items: center;padding:10px border-radius:10px;">
+            <p style="margin:0; color:#c16c45;">
+              for inquiry on our services, please contact us directly at
+              <a href="mailto:support@sohcahtoa.com" style="color:#f26522;">support@sohcahtoa.com</a>.
+            </p> </div>
+          </td>
+        </tr>
+        <tr>
+          <td style="background:#f3f3fe;border-top:1px;border-color:#d7d8e1;padding:15px;text-align:center;font-size:12px;color:#2c3345;">
+            © ${new Date().getFullYear()} SohCahToa. All rights reserved.
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+`;
+
       await transporter.sendMail(
-        getMailOptions(body.email, "Your submission was received", userHtml)
+        getMailOptions(body.email, "Your message has been sent to SOHCAHTOA support team", userHtml)
       );
     }
 

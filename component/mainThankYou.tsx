@@ -5,8 +5,8 @@ import ThankYouPage from "@/component/ThankYou";
 import { Suspense } from "react";
 import "@/styles/form.css";
 const images = [
-  "/r4.jpg",
-  "/s2-co2py.jpg",
+  "/2148761771.jpg",
+  "/2149057714.jpg",
   "/r2.jpg",
   "/r3.jpg",
 ];
@@ -66,7 +66,7 @@ export default function ThankYou() {
       <AnimatePresence mode="wait">
         <motion.div
           key={currentImage}
-          className="main-form-img-container"
+          className="main-form-img-container2"
         >
           <motion.div
             initial={animation.initial}
@@ -96,7 +96,7 @@ export default function ThankYou() {
       <div className="overlay" />
 
       {/* Form */}
-      <div className="container">
+      <div className="container another-thank-you-form">
         <Suspense fallback={<div>Loading...</div>}>
         <ThankYouPage/></Suspense>
       </div>

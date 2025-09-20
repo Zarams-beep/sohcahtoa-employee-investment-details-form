@@ -35,6 +35,9 @@ image-rendering: auto;
 .main-form-img-container{
   @apply hidden md:flex absolute inset-0 bg-cover bg-center overflow-hidden
 }
+.main-form-img-container2{
+  @apply flex absolute inset-0 bg-cover bg-center overflow-hidden
+}
 .sub-main-form-img-container{
   @apply absolute inset-0 bg-cover bg-center;
 }
@@ -67,3 +70,8 @@ image-rendering: auto;
 .container::-webkit-scrollbar-thumb:hover {
   background: #f7f7f7; /* darker orange on hover */
 }
+
+.another-thank-you-form{
+  @apply rounded-sm w-[80%] md:w-full
+}
+
