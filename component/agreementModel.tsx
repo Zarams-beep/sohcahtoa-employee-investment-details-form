@@ -40,7 +40,7 @@ export default function PreviewModal({
 
             <div className="sub-modal-overlay">
               <h3 className="">
-                SOHCAHTOA INVESTMENTS LIMITED - NON-COMPETE AND
+                SOHCAHTOA FINANCE LIMITED - NON-COMPETE AND
                 NON-CIRCUMVENTION AGREEMENT
               </h3>
               <p>
