@@ -27,6 +27,7 @@
     "googleapis": "^156.0.0",
     "html2canvas": "^1.4.1",
     "isomorphic-fetch": "^3.0.0",
+    "jspdf": "^3.0.3",
     "mongodb": "^6.17.0",
     "mongoose": "^8.16.0",
     "multer": "^2.0.2",

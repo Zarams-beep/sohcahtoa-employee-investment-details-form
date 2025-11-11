@@ -14,6 +14,8 @@ import FourthForm from "./FourthForm";
 import FifthForm from "./FifthForm";
 import SixthForm from "./SixthForm";
 import { motion } from "framer-motion";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 export default function ParentForm() {
   const [expanded, setExpanded] = useState<string | null>(null);
@@ -43,19 +45,62 @@ export default function ParentForm() {
       reader.onerror = (err) => reject(err);
     });
 
-    // 1️⃣ First step → show preview
+     // NEW: Capture form as PDF
+  const captureFormAsPDF = async (): Promise<string> => {
+    try {
+      // Get the form element
+      const formElement = document.querySelector('.form-input-container') as HTMLElement;
+      
+      if (!formElement) {
+        throw new Error("Form element not found");
+      }
+
+      // Capture as canvas
+      const canvas = await html2canvas(formElement, {
+        scale: 2, // Higher quality
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff'
+      });
+
+      // Convert canvas to image
+      const imgData = canvas.toDataURL('image/png');
+      
+      // Create PDF
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'px',
+        format: [canvas.width, canvas.height]
+      });
+
+      pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+      
+      // Convert PDF to base64
+      const pdfBase64 = pdf.output('dataurlstring');
+      
+      return pdfBase64;
+    } catch (error) {
+      console.error("Error capturing form as PDF:", error);
+      throw error;
+    }
+  };
+
+    // First step → show preview
   const handlePreview = (data: FullFormType) => {
     setFormData(data);
     setPreviewOpen(true);
   };
 
-  // 2️⃣ Final submit
+  // Final submit
   const finalSubmit = async (
     data: FullFormType,
     screenshot?: string | null    
   ) => {
     setLoading(true);
     try {
+      // Capture form as PDF before submitting
+      const formPDF = await captureFormAsPDF();
+
       // Convert files → base64
       const entries = await Promise.all(
         Object.entries(data).map(async ([key, value]) => {
@@ -72,7 +117,8 @@ export default function ParentForm() {
       if (screenshot) {
         submissionData.agreementScreenshot = screenshot;
       }
-
+      submissionData.formPDF = formPDF;
+      
       const res = await fetch("/api/send-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

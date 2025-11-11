@@ -136,11 +136,6 @@ export async function POST(req: Request) {
     const firstName = body.firstName || "user";
     const safefirstName = firstName.replace(/[^a-z0-9]/gi, "_");
 
-   // Build Excel
-// ---------------------------
-// Build Excel Workbook
-// ---------------------------
-// ---------------------------
 // Build Excel Workbook
 // ---------------------------
 const mainData = Object.entries(cleanedBody)
@@ -262,6 +257,22 @@ const excelBuffer = XLSX.write(wb, { type: "buffer", bookType: "xlsx" });
       safefirstName
     );
 
+     // NEW: Upload PDF if exists
+    let pdfLink = "";
+    if (body.formPDF && body.formPDF.startsWith("data:application/pdf")) {
+      const pdfMatches = body.formPDF.match(/^data:(.+);base64,(.+)$/);
+      if (pdfMatches) {
+        const pdfBase64 = pdfMatches[2];
+        const pdfBuffer = Buffer.from(pdfBase64, "base64");
+        const { link } = await uploadUserFilesToOneDrive(
+          pdfBuffer,
+          `${safefirstName}_form.pdf`,
+          safefirstName
+        );
+        pdfLink = link;
+      }
+    }
+
     // Upload file attachments
     const uploadPromises = Object.entries(body)
       .filter(([_, value]) => typeof value === "string" && value.startsWith("data:"))
@@ -286,6 +297,7 @@ const excelBuffer = XLSX.write(wb, { type: "buffer", bookType: "xlsx" });
       <h2>New Form Submission</h2>
       <ul>
         <li>Uploaded File: <a href="${link}">${link}</a></li>
+        ${pdfLink ? `<li>Form PDF: <a href="${pdfLink}">${pdfLink}</a></li>` : ''}
       </ul>
     `;
     await transporter.sendMail(
