@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 const employmentRow = z.object({
-  company: z.string().min(1, "Name of Company is required"),
-  address: z.string().min(1, "Enter your address please"),
+  company: z.string().min(3, "Name of Company is required"),
+  address: z.string().min(5, "Enter your address please"),
   from: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, "Use YYYY-MM-DD"),
@@ -13,7 +13,7 @@ const employmentRow = z.object({
     .string()
     .regex(/^\d+$/, "Duration must contain only numbers")
     .min(1, "Duration is required"),
-  designation: z.string().min(1, "Designation is required"),
+  designation: z.string().min(3, "Designation is required"),
 });
 
 const employmentArray = z
@@ -47,13 +47,13 @@ const employmentArray = z
   );
 
   const previousEmployerRow = z.object({
-  name: z.string().min(1, "Name is required"),
-  company: z.string().min(1, "Company Name is required"),
-  position: z.string().min(1, "Position is required"),
+  name: z.string().min(3, "Name is required"),
+  company: z.string().min(3, "Company Name is required"),
+  position: z.string().min(3, "Position is required"),
   contactDetails: z
     .string()
     .regex(/^\d+$/, "Contact Details must contain only numbers")
-    .min(1, "Contact Details are required"),
+    .min(8, "Contact Details are required"),
 });
 
 const previousEmployerArray = z
@@ -86,17 +86,17 @@ const previousEmployerArray = z
   export const fifthStage = z.object({
   employmentHistory: employmentArray,
   previousEmployers: previousEmployerArray,
-  pensionFund: z.string().min(1, "Pension Fund Administrator is required"),
+  pensionFund: z.string().min(3, "Pension Fund Administrator is required"),
     pensionPin: z
       .string()
       .regex(/^\d+$/, "Pension Pin must contain only numbers")
-      .min(1, "Pension Pin is required"),
-    bankName: z.string().min(1, "Bank Name is required"),
-    accountName: z.string().min(1, "Account Name is required"),
+      .min(3, "Pension Pin is required"),
+    bankName: z.string().min(3, "Bank Name is required"),
+    accountName: z.string().min(3, "Account Name is required"),
     accountNumber: z
       .string()
       .regex(/^\d+$/, "Account Number must contain only numbers")
-      .min(1, "Account Number is required"),
+      .min(8, "Account Number is required"),
 });
 
 

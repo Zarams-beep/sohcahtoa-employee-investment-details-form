@@ -32,7 +32,7 @@ export default function ParentForm() {
 
   const { handleSubmit } = methods;
 
-  // ⬇️ Toggle expand/collapse
+  // Toggle expand/collapse
   const toggleSection = (section: string) => {
     setExpanded(expanded === section ? null : section);
   };
@@ -57,23 +57,26 @@ export default function ParentForm() {
 
       // Capture as canvas
       const canvas = await html2canvas(formElement, {
-        scale: 2, // Higher quality
+        scale: 1.5,
         useCORS: true,
         logging: false,
         backgroundColor: '#ffffff'
       });
 
       // Convert canvas to image
-      const imgData = canvas.toDataURL('image/png');
+      const imgData = canvas.toDataURL('image/jpeg', 0.7);
       
-      // Create PDF
+      // Create PDF with A4 size instead of custom size
       const pdf = new jsPDF({
         orientation: 'portrait',
-        unit: 'px',
-        format: [canvas.width, canvas.height]
+        unit: 'mm',
+        format: 'a4'
       });
 
-      pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+      const imgWidth = 210; // A4 width in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
       
       // Convert PDF to base64
       const pdfBase64 = pdf.output('dataurlstring');
@@ -98,10 +101,7 @@ export default function ParentForm() {
   ) => {
     setLoading(true);
     try {
-      // Capture form as PDF before submitting
       const formPDF = await captureFormAsPDF();
-
-      // Convert files → base64
       const entries = await Promise.all(
         Object.entries(data).map(async ([key, value]) => {
           if (value instanceof File) {
@@ -118,7 +118,7 @@ export default function ParentForm() {
         submissionData.agreementScreenshot = screenshot;
       }
       submissionData.formPDF = formPDF;
-      
+
       const res = await fetch("/api/send-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

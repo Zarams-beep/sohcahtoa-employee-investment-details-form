@@ -31,23 +31,23 @@ export const secondStage = z
 
     // father name
     titleFather: z.enum(["Mr.", "Mrs.", "Miss.", "Dr.", "Prof.", "Rev."]),
-    SurnameFather: z.string().min(1, "Father Surname is required"),
-    firstNameFather: z.string().min(1, "Father First Name is required"),
-    fatherAddress: z.string().min(1, "Enter your Father address please"),
+    SurnameFather: z.string().min(3, "Father Surname is required"),
+    firstNameFather: z.string().min(3, "Father First Name is required"),
+    fatherAddress: z.string().min(5, "Enter your Father address please"),
     fatherPhoneNo: z
       .string()
       .regex(/^\d+$/, "Father's Phone Number must contain only numbers")
-      .min(1, "Father's Phone Number is required"),
+      .min(8, "Father's Phone Number is required"),
 
     // mother name
     titleMother: z.enum(["Mr.", "Mrs.", "Miss.", "Dr.", "Prof.", "Rev."]),
-    SurnameMother: z.string().min(1, "Mother Surname is required"),
-    firstNameMother: z.string().min(1, "Mother First Name is required"),
-    motherAddress: z.string().min(1, "Enter your Mother's Address please"),
+    SurnameMother: z.string().min(3, "Mother Surname is required"),
+    firstNameMother: z.string().min(3, "Mother First Name is required"),
+    motherAddress: z.string().min(5, "Enter your Mother's Address please"),
     motherPhoneNo: z
       .string()
       .regex(/^\d+$/, "Mother's Phone Number must contain only numbers")
-      .min(1, "Mother's Phone Number is required"),
+      .min(8, "Mother's Phone Number is required"),
 
     // spouse details (made optional by default)
     titleSpouse: z.enum(["Mr.", "Mrs.", "Miss.", "Dr.", "Prof.", "Rev."]).optional(),

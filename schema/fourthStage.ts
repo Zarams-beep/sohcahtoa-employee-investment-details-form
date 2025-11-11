@@ -1,11 +1,11 @@
 import { z } from "zod";
 
 const schoolRow = z.object({
-  nameOfInstitution: z.string().trim().min(1, "Institution name is required"),
-  degreeObtained: z.string().trim().min(1, "Degree is required"),
+  nameOfInstitution: z.string().trim().min(3, "Institution name is required"),
+  degreeObtained: z.string().trim().min(3, "Degree is required"),
   from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Use YYYY-MM-DD"),
   to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Use YYYY-MM-DD"),
-  grade: z.string().trim().min(1, "Grade is required"),
+  grade: z.string().trim().min(3, "Grade is required"),
 });
 
 // allow user to add multiple schools but ignore empty rows

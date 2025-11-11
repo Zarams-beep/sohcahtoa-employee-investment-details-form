@@ -29,23 +29,23 @@ export const thirdStage = z.object({
   dependent: dependentArray,  
   // next of kin
   titleKin: z.enum(["Mr.", "Mrs.", "Miss.", "Dr.", "Prof.", "Rev."]),
-  SurnameKin: z.string().min(1, "Kin Surname is required"),
-  firstNameKin: z.string().min(1, "Kin First Name is required"),
-  kinAddress: z.string().min(1, "Enter your Kin Address please"),
+  SurnameKin: z.string().min(3, "Kin Surname is required"),
+  firstNameKin: z.string().min(3, "Kin First Name is required"),
+  kinAddress: z.string().min(5, "Enter your Kin Address please"),
   kinPhoneNo: z
     .string()
     .regex(/^\d+$/, "Next of Kin's Phone Number must contain only numbers")
-    .min(1, "Next of Kin's Phone Number is required"),
+    .min(8, "Next of Kin's Phone Number is required"),
     relationshipKin: z.string().min(1, "Kin Relationship is required"),
 
   // emergency
   titleEmergency: z.enum(["Mr.", "Mrs.", "Miss.", "Dr.", "Prof.", "Rev."]),
-  SurnameEmergency: z.string().min(1, "Emergency Surname is required"),
-  firstNameEmergency: z.string().min(1, "Emergency First Name is required"),
-  emergencyAddress: z.string().min(1, "Enter your Emergency Address please"),
+  SurnameEmergency: z.string().min(3, "Emergency Surname is required"),
+  firstNameEmergency: z.string().min(3, "Emergency First Name is required"),
+  emergencyAddress: z.string().min(5, "Enter your Emergency Address please"),
   emergencyPhoneNo: z
     .string()
     .regex(/^\d+$/, "Emergency's Phone Number must contain only numbers")
-    .min(1, "Emergency's Phone Number is required"),
-    relationshipEmergency: z.string().min(1, "Emergency First Name is required"),
+    .min(8, "Emergency's Phone Number is required"),
+    relationshipEmergency: z.string().min(3, "Emergency First Name is required"),
 });
