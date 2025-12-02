@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import connect from "@/db";
 import FormSubmission from "@/modal/FormSubmission";
-import { transporter, getMailOptions } from "@/utils/emailConfig";
+import { sendEmail } from "@/utils/emailConfig";
 import { randomUUID } from "crypto";
 import * as XLSX from "xlsx";
 import { Client } from "@microsoft/microsoft-graph-client";
@@ -300,9 +300,11 @@ const excelBuffer = XLSX.write(wb, { type: "buffer", bookType: "xlsx" });
         ${pdfLink ? `<li>Form PDF: <a href="${pdfLink}">${pdfLink}</a></li>` : ''}
       </ul>
     `;
-    await transporter.sendMail(
-      getMailOptions(process.env.ADMIN_EMAIL!, "New Form Submission", adminHtml)
-    );
+   await sendEmail(
+  process.env.ADMIN_EMAIL!,
+  "New Form Submission",
+  adminHtml
+);
 
     if (body.email) {
       const userHtml = `
@@ -339,9 +341,11 @@ const excelBuffer = XLSX.write(wb, { type: "buffer", bookType: "xlsx" });
 </table>
 `;
 
-      await transporter.sendMail(
-        getMailOptions(body.email, "Your message has been sent to SOHCAHTOA support team", userHtml)
-      );
+       await sendEmail(
+  body.email,
+  "Your message has been sent to SOHCAHTOA HR team",
+  userHtml
+);
     }
 
     return NextResponse.json(
