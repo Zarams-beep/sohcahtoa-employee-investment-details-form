@@ -14,12 +14,16 @@ import FourthForm from "./FourthForm";
 import FifthForm from "./FifthForm";
 import SixthForm from "./SixthForm";
 import { motion } from "framer-motion";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import PDFTemplate from "./pdfForm";
 
 export default function ParentForm() {
   const [expanded, setExpanded] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [formData, setFormData] = useState<FullFormType | null>(null);
+  const [showPDFTemplate, setShowPDFTemplate] = useState(false);
 
   const router = useRouter();
 
@@ -49,6 +53,83 @@ export default function ParentForm() {
     setPreviewOpen(true);
   };
 
+  const captureFormAsPDF = async (): Promise<string> => {
+    try {
+      if (!formData) {
+        throw new Error("Form data not found");
+      }
+
+      // Show the PDF template
+      setShowPDFTemplate(true);
+      
+      // Wait longer for render + images to load
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      // Get the PDF template element
+      const pdfElement = document.getElementById('pdf-template');
+      if (!pdfElement) {
+        throw new Error("PDF template not found");
+      }
+
+      // Capture the entire PDF template
+      const canvas = await html2canvas(pdfElement, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+        allowTaint: true,
+        foreignObjectRendering: false,
+        imageTimeout: 15000,
+        onclone: (clonedDoc) => {
+          const clonedElement = clonedDoc.getElementById('pdf-template');
+          if (clonedElement) {
+            clonedElement.style.display = 'block';
+          }
+        }
+      });
+
+      // Hide the template
+      setShowPDFTemplate(false);
+
+      // Create PDF
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      const imgData = canvas.toDataURL('image/jpeg', 0.85);
+      const pageWidth = 210; // A4 width in mm
+      const pageHeight = 297; // A4 height in mm
+      const imgWidth = pageWidth;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      // Add first page
+      pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      // Add additional pages if content is longer than one page
+      while (heightLeft > 0) {
+        position = -pageHeight * Math.ceil((imgHeight - heightLeft) / pageHeight);
+        pdf.addPage();
+        pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      // Convert PDF to base64
+      const pdfBase64 = pdf.output('dataurlstring');
+      return pdfBase64;
+      
+    } catch (error) {
+      setShowPDFTemplate(false);
+      console.error('PDF generation error:', error);
+      throw error;
+    }
+  };
+
   // Final submit
   const finalSubmit = async (
     data: FullFormType,
@@ -56,6 +137,9 @@ export default function ParentForm() {
   ) => {
     setLoading(true);
     try {
+      // Generate PDF
+      const formPDF = await captureFormAsPDF();
+
       const entries = await Promise.all(
         Object.entries(data).map(async ([key, value]) => {
           if (value instanceof File) {
@@ -68,9 +152,13 @@ export default function ParentForm() {
 
       const submissionData: any = Object.fromEntries(entries);
 
+      // Add screenshot if available
       if (screenshot) {
         submissionData.agreementScreenshot = screenshot;
       }
+
+      // FIXED: Add the PDF to submission data
+      submissionData.formPDF = formPDF;
 
       const res = await fetch("/api/send-email", {
         method: "POST",
@@ -107,6 +195,19 @@ export default function ParentForm() {
 
   return (
     <FormProvider {...methods}>
+      {showPDFTemplate && formData && (
+        <div style={{ 
+          position: 'fixed', 
+          top: 0, 
+          left: '-9999px', // Hide offscreen instead of overlay
+          width: '210mm', // A4 width
+          backgroundColor: 'white',
+          zIndex: 9999
+        }}>
+          <PDFTemplate data={formData} />
+        </div>
+      )}
+
       <form
         onSubmit={handleSubmit(handlePreview, (errors) => {
           console.error("Validation errors:", errors);

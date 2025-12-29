@@ -234,7 +234,7 @@ export function FirstForm() {
                 showMonthDropdown
                 showYearDropdown
                 dropdownMode="select"
-                maxDate={new Date()}
+                maxDate={new Date (2026,1,31)}
                 minDate={new Date(1900, 0, 1)}
                 placeholderText="YYYY-MM-DD"
                 customInput={<DateInput hasError={!!errors.startDate} />}
