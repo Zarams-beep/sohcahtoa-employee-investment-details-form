@@ -1,24 +1,33 @@
-#pdf-template {
-  page-break-inside: avoid;
+#pdf-template{
+    page-break-inside: avoid;
+    break-inside: avoid;
 }
-
+.pdf-template-container h1{
+    @apply text-[20px] font-bold text-center text-primary mb-6;
+}
+.pdf-template-container section{
+    @apply mb-6 flex flex-col gap-2;
+}
+.pdf-template-container section h3{
+    @apply text-[18px] font-semibold text-mutedGray mb-2;
+}
 .pdf-sub-section-container,
-.pdf-sub-input-container,
-.pdf-form-content {
+.pdf-sub-input-container, .main-input-pdf-container {
   page-break-inside: avoid;
+  break-inside: avoid;
 }
-.page-break {
-  page-break-before: always;
-  break-before: page;
-}
-
 .pdf-template-container{
     @apply py-[20px]
 }
 .pdf-sub-header{
-    @apply flex flex-col items-end gap-y-1;
+    @apply flex flex-col items-end gap-y-1 mb-4 w-full;
 }
-
+.pdf-logo-container{
+    @apply w-[120px] h-[80px] flex items-center justify-center;
+}
+.pdf-logo-container img{
+    @apply w-auto h-[80px] object-contain;
+}
 .pdf-sub-header p{
     @apply m-0 text-sm text-mutedGray;
 }
@@ -31,20 +40,17 @@
 .pdf-personal-details p{
     @apply text-[18px] font-semibold text-mutedGray;
 }
-.letter-body{
-    @apply mb-[25px];
-}
-.letter-body p:first-child{
-    @apply mb-[20px] font-bold;
-}
-.letter-body-p{
-    @apply text-justify mb-[12px];
-}
-.letter-body p:last-child{
-    @apply font-bold mb-[25px];
-}
 .pdf-form-content{
     @apply mb-[20px] p-[20px] flex flex-col gap-6;
+}
+.main-input-pdf-container{
+    @apply grid grid-cols-2 gap-x-4 gap-y-6 w-full;
+}
+.pdf-detail-container{
+    @apply flex flex-col gap-1 my-3;
+}
+.pdf-detail-container h4{
+    @apply text-[16px] font-semibold text-mutedGray
 }
 .pdf-input{
     @apply p-[8px] border-b border-b-mutedGray rounded-[4px] bg-[white] w-full

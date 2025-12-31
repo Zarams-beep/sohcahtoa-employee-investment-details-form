@@ -2,7 +2,6 @@
 import "@/styles/pdfForm.css";
 import "@/styles/form.css"
 import { useEffect, useState } from "react";
-import Image from "next/image";
 
 interface PDFTemplateProps {
   data: any;
@@ -48,27 +47,35 @@ export default function PDFTemplate({ data }: PDFTemplateProps) {
         fontSize: '11pt',
       }}
     >
+      <h1>SOHCAHTOA HOLDINGS LIMITED - EMPLOYEE DETAILS FORM</h1>
+
       {/* PAGE 1 */}
-      <div style={{ minHeight: '257mm' }}> 
+      <div style={{ pageBreakAfter: "always" }} className="pdf-page"> 
         {/* Header */}
         <div className="pdf-sub-header">
-          <div className="img-container">
-            <Image src="/SH-logo.png" alt="SH-logo" width={100} height={100} priority/>
+          <div className="pdf-logo-container">
+            <img
+              src="/SIL logo.689b601bda7341.19720820.png"
+              alt="SIL logo"
+              width={120}
+              height={80}
+            />
           </div>
           <p>
-            Capwire House 19, Sinari Daranijo Street<br />
+            2 Floor, 11961 Bishop Oluwola Street
+            <br />
             Victoria Island Lagos
           </p>
         </div>
         
         {/* Form Fields Section */}
         <div className="pdf-form-content">
-          <h1>SOHCAHTOA HOLDINGS LIMITED - EMPLOYEE DETAILS FORM</h1>
+          
 
         <div className="pdf-personal-details">
-          {data.uploadPassport && (
+          {passportUrl && (
             <img
-              src={data.uploadPassport}
+              src={passportUrl}
               alt={data.Surname}
               width={80}
               height={80}
@@ -77,9 +84,11 @@ export default function PDFTemplate({ data }: PDFTemplateProps) {
           )}
         </div>
           {/* PART A */}
+
           <section>  
             <h3>PART A: PROFILE DETAILS (Kindly complete the details below accurately)</h3>
-            <div className="pdf-sub-section-container">
+           <div className="main-input-pdf-container">
+             <div className="pdf-sub-section-container">
               <h4>Contract Type</h4>
               <div className="pdf-input">{data.contractType}</div>
             </div>
@@ -143,12 +152,14 @@ export default function PDFTemplate({ data }: PDFTemplateProps) {
               <h4>Confirm Email</h4>
               <div className="pdf-input">{data.confirmEmail}</div>
             </div>
+           </div>
           </section>
 
           {/* PART B */}
           <section>  
             <h3>PART B: BIODATA (Kindly complete the details below accurately)</h3>
-            <div className="pdf-sub-section-container">
+            <div className="main-input-pdf-container">
+              <div className="pdf-sub-section-container">
               <h4>DOB</h4>
               <div className="pdf-input">{data.DOB}</div>
             </div>
@@ -188,10 +199,13 @@ export default function PDFTemplate({ data }: PDFTemplateProps) {
               <h4>Physically Challenged</h4>
               <div className="pdf-input">{data.PhysicallyChallenged}</div>
             </div>
+            </div>
             
             {/* Father Details */}
-            <h4 style={{ marginTop: '15px', fontWeight: 'bold' }}>Father's Information</h4>
-            <div className="pdf-sub-section-container">
+            <div className="pdf-detail-container">
+              <h4>Father's Information</h4>
+            <div className="main-input-pdf-container">
+              <div className="pdf-sub-section-container">
               <h4>Title</h4>
               <div className="pdf-input">{data.titleFather}</div>
             </div>
@@ -211,10 +225,14 @@ export default function PDFTemplate({ data }: PDFTemplateProps) {
               <h4>Phone No</h4>
               <div className="pdf-input">{data.fatherPhoneNo}</div>
             </div>
+            </div>
+            </div>
 
             {/* Mother Details */}
-            <h4 style={{ marginTop: '15px', fontWeight: 'bold' }}>Mother's Information</h4>
-            <div className="pdf-sub-section-container">
+           <div className="pdf-detail-container">
+             <h4>Mother's Information</h4>
+<div className="main-input-pdf-container">
+              <div className="pdf-sub-section-container">
               <h4>Title</h4>
               <div className="pdf-input">{data.titleMother}</div>
             </div>
@@ -234,10 +252,14 @@ export default function PDFTemplate({ data }: PDFTemplateProps) {
               <h4>Phone No</h4>
               <div className="pdf-input">{data.motherPhoneNo}</div>
             </div>
+</div>
+           </div>
 
             {/* Spouse Details */}
-            <h4 style={{ marginTop: '15px', fontWeight: 'bold' }}>Spouse Information</h4>
-            <div className="pdf-sub-section-container">
+            <div className="pdf-detail-container">
+              <h4>Spouse Information</h4>
+<div className="main-input-pdf-container">
+             <div className="pdf-sub-section-container">
               <h4>Title</h4>
               <div className="pdf-input">{data.titleSpouse}</div>
             </div>
@@ -257,21 +279,21 @@ export default function PDFTemplate({ data }: PDFTemplateProps) {
               <h4>Phone No</h4>
               <div className="pdf-input">{data.spousePhoneNo}</div>
             </div>
+             </div>
+            </div>
           </section>
         </div>
       </div>
 
-      {/* PAGE BREAK */}
-      <div className="page-break"></div>
 
       {/* PAGE 2 - PART C: DEPENDENTS */}
-      <div style={{ minHeight: '257mm', paddingTop: '0' }}>
-        <div className="pdf-form-content">
+      <div style={{ pageBreakAfter: "always" }} className="pdf-page">
           <section>
             <h3>PART C: DEPENDENT/NEXT OF KIN/EMERGENCY CONTACT DETAILS (Kindly complete the details below accurately)</h3>
             
             {/* Dependents Table */}
-            <h4 style={{ marginTop: '15px', fontWeight: 'bold' }}>Dependents</h4>
+            <div className="pdf-detail-container">
+              <h4>Dependents</h4>
             {data.dependent && data.dependent.length > 0 ? (
               <table style={{ 
                 width: '100%', 
@@ -299,10 +321,14 @@ export default function PDFTemplate({ data }: PDFTemplateProps) {
             ) : (
               <p>No dependents listed</p>
             )}
+            </div>
+            
 
             {/* Next of Kin */}
-            <h4 style={{ marginTop: '15px', fontWeight: 'bold' }}>Next of Kin</h4>
-            <div className="pdf-sub-section-container">
+           <div className="pdf-detail-container">
+             <h4>Next of Kin</h4>
+           <div className="main-input-pdf-container">
+             <div className="pdf-sub-section-container">
               <h4>Title</h4>
               <div className="pdf-input">{data.titleKin}</div>
             </div>
@@ -326,9 +352,13 @@ export default function PDFTemplate({ data }: PDFTemplateProps) {
               <h4>Relationship</h4>
               <div className="pdf-input">{data.relationshipKin}</div>
             </div>
+           </div>
+           </div>
 
             {/* Emergency Contact */}
-            <h4 style={{ marginTop: '15px', fontWeight: 'bold' }}>Emergency Contact</h4>
+          <div className="pdf-detail-container">
+            <h4>Emergency Contact</h4>
+            <div className="main-input-pdf-container">
             <div className="pdf-sub-section-container">
               <h4>Title</h4>
               <div className="pdf-input">{data.titleEmergency}</div>
@@ -352,22 +382,19 @@ export default function PDFTemplate({ data }: PDFTemplateProps) {
             <div className="pdf-sub-section-container">
               <h4>Relationship</h4>
               <div className="pdf-input">{data.relationshipEmergency}</div>
-            </div>
+            </div></div></div>
           </section>
-        </div>
       </div>
 
-      {/* PAGE BREAK */}
-      <div className="page-break"></div>
 
       {/* PAGE 3 - PART D: EDUCATION */}
-      <div style={{ minHeight: '257mm', paddingTop: '0' }}>
-        <div className="pdf-form-content">
+      <div style={{ pageBreakAfter: "always" }} className="pdf-page">
           <section>
             <h3>PART D: EDUCATION/PROFESSIONAL TRAINING HISTORY (Kindly complete the details below accurately)</h3>
             
             {/* School History Table */}
-            <h4 style={{ marginTop: '15px', fontWeight: 'bold' }}>Educational History</h4>
+            <div className="pdf-detail-container">
+            <h4>Educational History</h4>
             {data.school && data.school.length > 0 ? (
               <table style={{ 
                 width: '100%', 
@@ -399,10 +426,11 @@ export default function PDFTemplate({ data }: PDFTemplateProps) {
               </table>
             ) : (
               <p>No educational history listed</p>
-            )}
+            )}</div>
 
             {/* Professional Certifications Table */}
-            <h4 style={{ marginTop: '15px', fontWeight: 'bold' }}>Professional Certifications</h4>
+            <div className="pdf-detail-container">
+            <h4>Professional Certifications</h4>
             {data.professional && data.professional.length > 0 ? (
               <table style={{ 
                 width: '100%', 
@@ -429,22 +457,19 @@ export default function PDFTemplate({ data }: PDFTemplateProps) {
               </table>
             ) : (
               <p>No professional certifications listed</p>
-            )}
+            )}</div>
           </section>
-        </div>
       </div>
 
-      {/* PAGE BREAK */}
-      <div className="page-break"></div>
 
       {/* PAGE 4 - PART E: EMPLOYMENT HISTORY */}
-      <div style={{ minHeight: '257mm', paddingTop: '0' }}>
-        <div className="pdf-form-content">
+      <div style={{ pageBreakAfter: "always" }} className="pdf-page">
           <section>
             <h3>PART E: EMPLOYMENT HISTORY/PENSION AND BANK DETAILS (Kindly complete the details below accurately)</h3>
             
             {/* Employment History Table */}
-            <h4 style={{ marginTop: '15px', fontWeight: 'bold' }}>Employment History</h4>
+            <div className="pdf-detail-container">
+            <h4>Employment History</h4>
             {data.employmentHistory && data.employmentHistory.length > 0 ? (
               <table style={{ 
                 width: '100%', 
@@ -478,10 +503,11 @@ export default function PDFTemplate({ data }: PDFTemplateProps) {
               </table>
             ) : (
               <p>No employment history listed</p>
-            )}
+            )}</div>
 
             {/* Previous Employers Table */}
-            <h4 style={{ marginTop: '15px', fontWeight: 'bold' }}>Previous Employers References</h4>
+            <div className="pdf-detail-container">
+            <h4>Previous Employers References</h4>
             {data.previousEmployers && data.previousEmployers.length > 0 ? (
               <table style={{ 
                 width: '100%', 
@@ -511,9 +537,11 @@ export default function PDFTemplate({ data }: PDFTemplateProps) {
             ) : (
               <p>No previous employers listed</p>
             )}
-
+</div>
             {/* Pension Details */}
-            <h4 style={{ marginTop: '15px', fontWeight: 'bold' }}>Pension Details</h4>
+            <div className="pdf-detail-container">
+            <h4>Pension Details</h4>
+            <div className="main-input-pdf-container">
             <div className="pdf-sub-section-container">
               <h4>Pension Fund Administrator</h4>
               <div className="pdf-input">{data.pensionFund}</div>
@@ -521,10 +549,12 @@ export default function PDFTemplate({ data }: PDFTemplateProps) {
             <div className="pdf-sub-section-container">
               <h4>Pension PIN</h4>
               <div className="pdf-input">{data.pensionPin}</div>
-            </div>
+            </div></div></div>
 
             {/* Bank Details */}
-            <h4 style={{ marginTop: '15px', fontWeight: 'bold' }}>Bank Details</h4>
+            <div className="pdf-detail-container">
+            <h4>Bank Details</h4>
+            <div className="main-input-pdf-container">
             <div className="pdf-sub-section-container">
               <h4>Bank Name</h4>
               <div className="pdf-input">{data.bankName}</div>
@@ -536,22 +566,15 @@ export default function PDFTemplate({ data }: PDFTemplateProps) {
             <div className="pdf-sub-section-container">
               <h4>Account Number</h4>
               <div className="pdf-input">{data.accountNumber}</div>
-            </div>
+            </div></div></div>
           </section>
-        </div>
       </div>
 
-      {/* PAGE BREAK */}
-      <div className="page-break"></div>
 
       {/* PAGE 5 - DECLARATION & SIGNATURE */}
-      <div style={{ minHeight: '257mm', paddingTop: '0' }}>
-        <div className="pdf-form-content">
+      <div style={{ pageBreakAfter: "always" }} className="pdf-page">
           <h3>PART F: OTHER CIVIC DETAILS/SIGNATURE/DATE/PASSPORT PHOTOGRAPH (Kindly complete the details below accurately)</h3>
-          
-        
-        </div>
-
+<div className="main-input-pdf-container">
         <div className="pdf-sub-section-container">
               <h4>Convicted Crime</h4>
               <div className="pdf-input">{data.convictedCrime}</div>
@@ -560,7 +583,7 @@ export default function PDFTemplate({ data }: PDFTemplateProps) {
            <div className="pdf-sub-section-container">
               <h4>if Others</h4>
               <div className="pdf-input">{data.ifOthers}</div>
-            </div>  
+            </div>  </div>
         <div className="pdf-signature-container">
           <div className="pdf-sub-section-container">
             <h4>Date</h4>
