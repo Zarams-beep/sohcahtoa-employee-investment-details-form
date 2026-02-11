@@ -145,7 +145,7 @@ export default function SixthForm() {
             {/* Signature */}
             <span className="sub-span">
               <h4>
-                Referee/Guarantor Signature <CgAsterisk className="star-icon" />
+                Signature <CgAsterisk className="star-icon" />
               </h4>
               <Controller
                 name="signature"
