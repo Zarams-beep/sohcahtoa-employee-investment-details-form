@@ -128,8 +128,6 @@ export default function SixthForm() {
                     showMonthDropdown
                     showYearDropdown
                     dropdownMode="select"
-                    maxDate={new Date()}
-                    minDate={new Date(1900, 0, 1)}
                     placeholderText="YYYY-MM-DD"
                     customInput={<DateInput hasError={!!errors.date} />}
                     calendarClassName="custom-calendar"
