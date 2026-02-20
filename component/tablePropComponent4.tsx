@@ -107,6 +107,11 @@ export default function EmploymentHistoryTable({
         <CgAsterisk className="star-icon" />
       </h4>
 
+      {/* Info notification about date range requirement */}
+      <div className="info-notification">
+        ℹ️ Please provide both <strong>From</strong> and <strong>To</strong> dates for each employment. The start date must not be after the end date.
+      </div>
+
       <div className="table-sub-container">
         <table>
           <thead>
@@ -114,8 +119,8 @@ export default function EmploymentHistoryTable({
               <th>#</th>
               <th className="tr-showing-part">Company</th>
               <th className="tr-showing-part">Address</th>
-              <th className="tr-showing-part">From</th>
-              <th className="tr-showing-part">To</th>
+              <th className="tr-showing-part">From <span style={{ fontSize: "11px", color: "#666" }}>(start)</span></th>
+              <th className="tr-showing-part">To <span style={{ fontSize: "11px", color: "#666" }}>(end)</span></th>
               <th className="tr-showing-part">Duration of Service</th>
               <th className="tr-showing-part">Designation</th>
             </tr>

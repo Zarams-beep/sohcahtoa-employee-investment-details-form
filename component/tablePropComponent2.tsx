@@ -83,6 +83,11 @@ export default function DependentsTable2({ name = "school" }: SchoolTableProps) 
         <CgAsterisk className="star-icon" />
       </h4>
 
+      {/* Info notification about date range requirement */}
+      <div className="info-notification">
+        ℹ️ Please provide both <strong>From</strong> and <strong>To</strong> dates for each school attended. The start date must not be after the end date.
+      </div>
+
       <div className="table-sub-container">
         <table>
           <thead>
@@ -90,8 +95,8 @@ export default function DependentsTable2({ name = "school" }: SchoolTableProps) 
               <th></th>
               <th className="tr-showing-part">Name of Institution</th>
               <th className="tr-showing-part">Degree Obtained</th>
-              <th className="tr-showing-part">From</th>
-              <th className="tr-showing-part">To</th>
+              <th className="tr-showing-part">From <span style={{ fontSize: "11px", color: "#666" }}>(start)</span></th>
+              <th className="tr-showing-part">To <span style={{ fontSize: "11px", color: "#666" }}>(end)</span></th>
               <th className="tr-showing-part">Grade</th>
             </tr>
           </thead>

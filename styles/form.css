@@ -127,6 +127,17 @@ textarea{
 .table-container .error-message {
   @apply text-[#a00606] text-[13px];
 }
+
+/* Info notification styling */
+.info-notification {
+  @apply mb-3 p-2.5 rounded text-sm leading-relaxed flex items-center gap-2;
+  background-color: #e3f2fd;
+  border: 1px solid #90caf9;
+  color: #1565c0;
+}
+.info-notification strong {
+  @apply font-semibold;
+}
 .table-sub-container{
   @apply overflow-auto w-full
 }
