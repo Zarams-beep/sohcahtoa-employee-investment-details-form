@@ -24,6 +24,15 @@ const DateInput = forwardRef<
 ));
 DateInput.displayName = "DateInput";
 
+// Helper function to convert Date to YYYY-MM-DD format in local timezone (not UTC)
+const formatDateToLocal = (date: Date | null): string => {
+  if (!date) return "";
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
 export default function SixthForm() {
   const [date, setDate] = useState<Date | null>(null);
   const [fileNames, setFileNames] = useState<Record<string, string | null>>({});
@@ -111,13 +120,13 @@ export default function SixthForm() {
                     selected={date}
                     onChange={(date: Date | null) => {
                       setDate(date);
-                      field.onChange(date ? date.toISOString().split("T")[0] : "");
+                      field.onChange(date ? formatDateToLocal(date) : "");
                     }}
                     onChangeRaw={(event) => {
                       if (event?.target instanceof HTMLInputElement) {
                         const manualValue = event.target.value.trim();
                         field.onChange(manualValue);
-                        const parsedDate = new Date(manualValue);
+                        const parsedDate = new Date(manualValue + "T00:00:00");
                         if (!isNaN(parsedDate.getTime())) {
                           setDate(parsedDate);
                         }

@@ -1,4 +1,4 @@
-import { useState, forwardRef } from "react";
+import { useState, forwardRef, useEffect } from "react";
 import { useFormContext, Controller, useWatch } from "react-hook-form";
 import { FullFormType } from "@/schema/formSchema";
 import { CgAsterisk } from "react-icons/cg";
@@ -22,16 +22,54 @@ const DateInput = forwardRef<
 ));
 DateInput.displayName = "DateInput";
 
+// Helper function to convert Date to YYYY-MM-DD format in local timezone (not UTC)
+const formatDateToLocal = (date: Date | null): string => {
+  if (!date) return "";
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+// Helper function to calculate age from DOB
+const calculateAge = (dobString: string): string => {
+  if (!dobString) return "";
+  const dob = new Date(dobString + "T00:00:00");
+  const today = new Date();
+  let age = today.getFullYear() - dob.getFullYear();
+  const monthDiff = today.getMonth() - dob.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+    age--;
+  }
+  return age >= 0 ? age.toString() : "";
+};
+
 export function SecondForm() {
   const [date, setDate] = useState<Date | null>(null);
 
   const {
     register,
     control,
+    setValue,
+    watch,
     formState: { errors },
   } = useFormContext<FullFormType>();
 
-    const maritalStatus = useWatch({
+  // Watch DOB field to keep date state in sync and auto-calculate age
+  const dobValue = watch("DOB");
+  useEffect(() => {
+    if (dobValue) {
+      const parsedDate = new Date(dobValue + "T00:00:00");
+      if (!isNaN(parsedDate.getTime())) {
+        setDate(parsedDate);
+        // Auto-calculate and set age
+        const age = calculateAge(dobValue);
+        setValue("age", age, { shouldValidate: false });
+      }
+    }
+  }, [dobValue, setValue]);
+
+  const maritalStatus = useWatch({
     control,
     name: "maritalStatus",
   });
@@ -54,14 +92,14 @@ export function SecondForm() {
                   onChange={(date: Date | null) => {
                     setDate(date);
                     field.onChange(
-                      date ? date.toISOString().split("T")[0] : ""
+                      date ? formatDateToLocal(date) : ""
                     );
                   }}
                   onChangeRaw={(event) => {
                     if (event?.target instanceof HTMLInputElement) {
                       const manualValue = event.target.value.trim();
                       field.onChange(manualValue);
-                      const parsedDate = new Date(manualValue);
+                      const parsedDate = new Date(manualValue + "T00:00:00");
                       if (!isNaN(parsedDate.getTime())) {
                         setDate(parsedDate);
                       }
@@ -95,6 +133,7 @@ export function SecondForm() {
               {...register("age")}
               className={errors.age ? "error-line" : ""}
               type="number"
+              readOnly
             />
             {errors.age && (
               <p className="error-message">{errors.age.message}</p>

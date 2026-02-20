@@ -68,7 +68,13 @@ export default function EmploymentHistoryTable({
         j.designation
     ) || [];
 
-  // ✅ Mark as incomplete if any required field is missing
+  // ✅ Check if a job row has valid date range
+  const isValidDateRange = (from: string, to: string): boolean => {
+    if (!from || !to) return true; // allow empty dates
+    return new Date(from) <= new Date(to);
+  };
+
+  // ✅ Mark as incomplete if any required field is missing or date range is invalid
   const someRowIncomplete =
     activeRows.length > 0 &&
     activeRows.some(
@@ -78,7 +84,8 @@ export default function EmploymentHistoryTable({
         !j.from ||
         !j.to ||
         !j.durationOfService ||
-        !j.designation
+        !j.designation ||
+        !isValidDateRange(j.from, j.to)
     );
 
   // ✅ Dynamically set / clear global error
@@ -86,7 +93,7 @@ export default function EmploymentHistoryTable({
     if (someRowIncomplete) {
       setError(name, {
         type: "manual",
-        message: "Please fill all employment history fields",
+        message: "Please fill all employment history fields and ensure start date is not after end date",
       });
     } else {
       clearErrors(name);

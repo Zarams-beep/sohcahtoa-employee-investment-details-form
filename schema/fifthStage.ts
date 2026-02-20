@@ -14,7 +14,16 @@ const employmentRow = z.object({
     .regex(/^\d+$/, "Duration must contain only numbers")
     .min(1, "Duration is required"),
   designation: z.string().min(3, "Designation is required"),
-});
+}).refine(
+  (data) => {
+    if (!data.from || !data.to) return true;
+    return new Date(data.from) <= new Date(data.to);
+  },
+  {
+    message: "Start date cannot be after end date",
+    path: ["from"],
+  }
+);
 
 const employmentArray = z
   .array(
@@ -43,7 +52,7 @@ const employmentArray = z
   })
   .refine(
     rows => rows.every(r => employmentRow.safeParse(r).success),
-    { message: "Each filled employment history must have all fields valid" }
+    { message: "Each filled employment history must have all fields valid and dates in correct order" }
   );
 
   const previousEmployerRow = z.object({

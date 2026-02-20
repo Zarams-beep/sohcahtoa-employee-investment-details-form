@@ -48,7 +48,13 @@ export default function DependentsTable2({ name = "school" }: SchoolTableProps) 
         s.grade
     ) || [];
 
-  // ✅ show error only if there is at least one active row AND any of them is incomplete
+  // ✅ check if a school row has valid date range
+  const isValidDateRange = (from: string, to: string): boolean => {
+    if (!from || !to) return true; // allow empty dates
+    return new Date(from) <= new Date(to);
+  };
+
+  // ✅ show error only if there is at least one active row AND any of them is incomplete or has invalid dates
   const someRowIncomplete =
     activeRows.length > 0 &&
     activeRows.some(
@@ -57,13 +63,14 @@ export default function DependentsTable2({ name = "school" }: SchoolTableProps) 
         !s.degreeObtained ||
         !s.from ||
         !s.to ||
-        !s.grade
+        !s.grade ||
+        !isValidDateRange(s.from, s.to)
     );
 
   // ✅ sync custom error with RHF so it clears as soon as fields are complete
   useEffect(() => {
     if (someRowIncomplete) {
-      setError("school", { type: "manual", message: "Please fill all school fields" });
+      setError("school", { type: "manual", message: "Please fill all school fields and ensure start date is not after end date" });
     } else {
       clearErrors("school");
     }

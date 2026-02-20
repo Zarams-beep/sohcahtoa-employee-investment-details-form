@@ -6,7 +6,16 @@ const schoolRow = z.object({
   from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Use YYYY-MM-DD"),
   to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Use YYYY-MM-DD"),
   grade: z.string().trim().min(3, "Grade is required"),
-});
+}).refine(
+  (data) => {
+    if (!data.from || !data.to) return true;
+    return new Date(data.from) <= new Date(data.to);
+  },
+  {
+    message: "Start date cannot be after end date",
+    path: ["from"],
+  }
+);
 
 // allow user to add multiple schools but ignore empty rows
 const schoolArray = z
@@ -35,7 +44,7 @@ const schoolArray = z
   })
   .refine(
     rows => rows.every(r => schoolRow.safeParse(r).success),
-    { message: "Each filled school entry must have all fields valid" }
+    { message: "Each filled school entry must have all fields valid and dates in correct order" }
   );
 
 // professional rows
