@@ -1,3 +1,4 @@
+"use client";
 import { useState, forwardRef, useEffect } from "react";
 import { useFormContext, Controller, useWatch } from "react-hook-form";
 import { FullFormType } from "@/schema/formSchema";
@@ -16,103 +17,103 @@ const DateInput = forwardRef<
     ref={ref}
     className={`date-input ${hasError ? "error-line" : ""}`}
   >
-    <span>{value || "YYYY-MM-DD"}</span>
+    <span>{value || "DD/MM/YYYY"}</span>
     <FaRegCalendarAlt />
   </button>
 ));
 DateInput.displayName = "DateInput";
 
-// Helper function to convert Date to YYYY-MM-DD format in local timezone (not UTC)
-const formatDateToLocal = (date: Date | null): string => {
-  if (!date) return "";
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
+/**
+ * Format a Date → YYYY-MM-DD using LOCAL year/month/day.
+ * Never use .toISOString() — that converts to UTC first, which shifts
+ * the date by 1 day for users in timezones like WAT (UTC+1).
+ */
+const formatDateToLocal = (date: Date): string => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
 };
 
-// Helper function to calculate age from DOB
-const calculateAge = (dobString: string): string => {
-  if (!dobString) return "";
-  const dob = new Date(dobString + "T00:00:00");
+/**
+ * Parse YYYY-MM-DD → Date in LOCAL timezone.
+ * new Date("1990-05-15") parses as UTC midnight → wrong day in WAT.
+ * new Date(1990, 4, 15) uses local time → correct.
+ */
+const parseLocalDate = (s: string): Date | null => {
+  const parts = s.split("-").map(Number);
+  if (parts.length !== 3 || parts.some(isNaN)) return null;
+  const d = new Date(parts[0], parts[1] - 1, parts[2]);
+  return isNaN(d.getTime()) ? null : d;
+};
+
+/** Calculate age from a stored YYYY-MM-DD string. */
+const calculateAge = (dob: string): string => {
+  const d = parseLocalDate(dob);
+  if (!d) return "";
   const today = new Date();
-  let age = today.getFullYear() - dob.getFullYear();
-  const monthDiff = today.getMonth() - dob.getMonth();
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
-    age--;
-  }
-  return age >= 0 ? age.toString() : "";
+  let age = today.getFullYear() - d.getFullYear();
+  const notYet =
+    today.getMonth() < d.getMonth() ||
+    (today.getMonth() === d.getMonth() && today.getDate() < d.getDate());
+  if (notYet) age--;
+  return age >= 0 ? String(age) : "";
 };
 
 export function SecondForm() {
-  const [date, setDate] = useState<Date | null>(null);
+  const [dobDate, setDobDate] = useState<Date | null>(null);
 
   const {
     register,
     control,
     setValue,
-    watch,
     formState: { errors },
   } = useFormContext<FullFormType>();
 
-  // Watch DOB field to keep date state in sync and auto-calculate age
-  const dobValue = watch("DOB");
+  const dobValue      = useWatch({ control, name: "DOB" });
+  const maritalStatus = useWatch({ control, name: "maritalStatus" });
+
+  // Sync picker + auto-age whenever DOB value changes
   useEffect(() => {
     if (dobValue) {
-      const parsedDate = new Date(dobValue + "T00:00:00");
-      if (!isNaN(parsedDate.getTime())) {
-        setDate(parsedDate);
-        // Auto-calculate and set age
-        const age = calculateAge(dobValue);
-        setValue("age", age, { shouldValidate: false });
+      const parsed = parseLocalDate(dobValue);
+      if (parsed) {
+        setDobDate(parsed);
+        setValue("age", calculateAge(dobValue), { shouldValidate: true });
       }
     }
   }, [dobValue, setValue]);
-
-  const maritalStatus = useWatch({
-    control,
-    name: "maritalStatus",
-  });
 
   return (
     <div className="form">
       <div className="overall-form-sub">
         <div className="sub-input-container-unique">
-          {/* Date of Birth */}
+
+          {/* ── Date of Birth ── */}
           <section className="sub-section-container">
-            <h4>
-              Date of Birth <CgAsterisk className="star-icon" />
-            </h4>
+            <h4>Date of Birth <CgAsterisk className="star-icon" /></h4>
             <Controller
               name="DOB"
               control={control}
               render={({ field }) => (
                 <DatePicker
-                  selected={date}
-                  onChange={(date: Date | null) => {
-                    setDate(date);
-                    field.onChange(
-                      date ? formatDateToLocal(date) : ""
-                    );
+                  selected={dobDate}
+                  onChange={(d: Date | null) => {
+                    setDobDate(d);
+                    // Store as YYYY-MM-DD using local time — never UTC
+                    field.onChange(d ? formatDateToLocal(d) : "");
                   }}
-                  onChangeRaw={(event) => {
-                    if (event?.target instanceof HTMLInputElement) {
-                      const manualValue = event.target.value.trim();
-                      field.onChange(manualValue);
-                      const parsedDate = new Date(manualValue + "T00:00:00");
-                      if (!isNaN(parsedDate.getTime())) {
-                        setDate(parsedDate);
-                      }
-                    }
-                  }}
-                  dateFormat="yyyy-MM-dd"
+                  // No onChangeRaw — removed because its type signature changed
+                  // in newer react-datepicker versions, causing TypeScript build
+                  // errors. The Zod dateSchema handles format normalisation.
+                  dateFormat="dd/MM/yyyy"
                   showPopperArrow={false}
                   showMonthDropdown
                   showYearDropdown
                   dropdownMode="select"
                   maxDate={new Date()}
                   minDate={new Date(1900, 0, 1)}
-                  placeholderText="YYYY-MM-DD"
+                  placeholderText="DD/MM/YYYY"
                   customInput={<DateInput hasError={!!errors.DOB} />}
                   calendarClassName="custom-calendar"
                   popperClassName="z-50"
@@ -120,15 +121,13 @@ export function SecondForm() {
               )}
             />
             {errors.DOB && (
-              <p className="error-message">{errors.DOB.message}</p>
+              <p className="error-message">{errors.DOB.message as string}</p>
             )}
           </section>
 
-          {/* Age */}
+          {/* ── Age (auto-calculated, read-only) ── */}
           <section className="sub-section-container">
-            <h4>
-              Age <CgAsterisk className="star-icon" />
-            </h4>
+            <h4>Age <CgAsterisk className="star-icon" /></h4>
             <input
               {...register("age")}
               className={errors.age ? "error-line" : ""}
@@ -136,7 +135,7 @@ export function SecondForm() {
               readOnly
             />
             {errors.age && (
-              <p className="error-message">{errors.age.message}</p>
+              <p className="error-message">{errors.age.message as string}</p>
             )}
           </section>
         </div>
@@ -144,430 +143,204 @@ export function SecondForm() {
         <div className="sub-input-container-unique">
           {/* Gender */}
           <section className="sub-section-container">
-            <h4>
-              Gender <CgAsterisk className="star-icon" />
-            </h4>
+            <h4>Gender <CgAsterisk className="star-icon" /></h4>
             <select {...register("gender")}>
               <option value="">Please Select</option>
               {["Female", "Male"].map((opt) => (
-                <option key={opt} value={opt}>
-                  {opt}
-                </option>
+                <option key={opt} value={opt}>{opt}</option>
               ))}
             </select>
-            {errors.gender && (
-              <p className="error-message">{errors.gender.message}</p>
-            )}
+            {errors.gender && <p className="error-message">{errors.gender.message as string}</p>}
           </section>
 
           {/* State of Origin */}
           <section className="sub-section-container">
-            <h4>
-              State of Origin{" "}
-                <CgAsterisk className="star-icon" />
-            </h4>
-            <input
-              {...register("stateOfOrigin")}
-              className={errors.stateOfOrigin ? "error-line" : ""}
-            />
-            {errors.stateOfOrigin && (
-              <p className="error-message">{errors.stateOfOrigin.message}</p>
-            )}
+            <h4>State of Origin <CgAsterisk className="star-icon" /></h4>
+            <input {...register("stateOfOrigin")} className={errors.stateOfOrigin ? "error-line" : ""} />
+            {errors.stateOfOrigin && <p className="error-message">{errors.stateOfOrigin.message as string}</p>}
           </section>
         </div>
 
         <div className="sub-input-container-unique">
-          {/* Local Government Area */}
+          {/* LGA */}
           <section className="sub-section-container">
-              <h4>
-                Local Government Area{" "}
-                <CgAsterisk className="star-icon" />
-            </h4>
-            <input
-              {...register("LGA")}
-              className={errors.LGA ? "error-line" : ""}
-            />
-            {errors.LGA && (
-              <p className="error-message">{errors.LGA.message}</p>
-            )}
+            <h4>Local Government Area <CgAsterisk className="star-icon" /></h4>
+            <input {...register("LGA")} className={errors.LGA ? "error-line" : ""} />
+            {errors.LGA && <p className="error-message">{errors.LGA.message as string}</p>}
           </section>
 
-          {/* maritalStatus */}
+          {/* Marital Status */}
           <section className="sub-section-container">
-            <h4>
-              Marital Status <CgAsterisk className="star-icon" />
-            </h4>
+            <h4>Marital Status <CgAsterisk className="star-icon" /></h4>
             <select {...register("maritalStatus")}>
               <option value="">Please Select</option>
-              {["Single", "Married", "Divorced", "Separated", "Other"].map(
-                (opt) => (
-                  <option key={opt} value={opt}>
-                    {opt}
-                  </option>
-                )
-              )}
+              {["Single", "Married", "Divorced", "Separated", "Other"].map((opt) => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))}
             </select>
-            {errors.maritalStatus && (
-              <p className="error-message">{errors.maritalStatus.message}</p>
-            )}
+            {errors.maritalStatus && <p className="error-message">{errors.maritalStatus.message as string}</p>}
           </section>
         </div>
 
         <div className="sub-input-container-unique">
-          {/* ifOthers */}
-
-          {maritalStatus === "Other" &&
-          <section className="sub-section-container">
-            <h4>Other, specify</h4>
-            <input
-              {...register("ifOthers")}
-              className={errors.ifOthers ? "error-line" : ""}
-            />
-            {errors.ifOthers && (
-              <p className="error-message">{errors.ifOthers.message}</p>
-            )}
-          </section>}
+          {maritalStatus === "Other" && (
+            <section className="sub-section-container">
+              <h4>Other, specify</h4>
+              <input {...register("ifOthers")} className={errors.ifOthers ? "error-line" : ""} />
+              {errors.ifOthers && <p className="error-message">{errors.ifOthers.message as string}</p>}
+            </section>
+          )}
 
           {/* Religion */}
           <section className="sub-section-container">
-            <h4>
-              Religion <CgAsterisk className="star-icon" />
-            </h4>
+            <h4>Religion <CgAsterisk className="star-icon" /></h4>
             <select {...register("Religion")}>
               <option value="">Please Select</option>
               {["Christian", "Muslim", "Other"].map((opt) => (
-                <option key={opt} value={opt}>
-                  {opt}
-                </option>
+                <option key={opt} value={opt}>{opt}</option>
               ))}
             </select>
-            {errors.Religion && (
-              <p className="error-message">{errors.Religion.message}</p>
-            )}
+            {errors.Religion && <p className="error-message">{errors.Religion.message as string}</p>}
           </section>
         </div>
 
         <div className="sub-input-container-unique">
           {/* Ethnicity */}
           <section className="sub-section-container">
-            <h4>
-              Ethnicity <CgAsterisk className="star-icon" />
-            </h4>
-            <input
-              {...register("Ethnicity")}
-              placeholder=""
-              className={errors.Ethnicity ? "error-line" : ""}
-            />
-            {errors.Ethnicity && (
-              <p className="error-message">{errors.Ethnicity.message}</p>
-            )}
+            <h4>Ethnicity <CgAsterisk className="star-icon" /></h4>
+            <input {...register("Ethnicity")} className={errors.Ethnicity ? "error-line" : ""} />
+            {errors.Ethnicity && <p className="error-message">{errors.Ethnicity.message as string}</p>}
           </section>
 
-          {/* National I.D. Number */}
+          {/* NIN */}
           <section className="sub-section-container">
-            <h4>
-              National I.D. Number <CgAsterisk className="star-icon" />
-            </h4>
-            <input
-              {...register("NIN")}
-              placeholder=""
-              className={errors.NIN ? "error-line" : ""}
-            />
-            {errors.NIN && (
-              <p className="error-message">{errors.NIN.message}</p>
-            )}
+            <h4>National I.D. Number <CgAsterisk className="star-icon" /></h4>
+            <input {...register("NIN")} className={errors.NIN ? "error-line" : ""} />
+            {errors.NIN && <p className="error-message">{errors.NIN.message as string}</p>}
           </section>
         </div>
 
         {/* Physically Challenged */}
         <section className="sub-section-container">
-          <h4>
-            Physically Challenged <CgAsterisk className="star-icon" />
-          </h4>
+          <h4>Physically Challenged <CgAsterisk className="star-icon" /></h4>
           <div className="radio-group">
-            <label>
-              <input
-                type="radio"
-                value="Yes"
-                {...register("PhysicallyChallenged")}
-              />
-              Yes
-            </label>
-            <label>
-              <input
-                type="radio"
-                value="No"
-                {...register("PhysicallyChallenged")}
-              />
-              No
-            </label>
+            <label><input type="radio" value="Yes" {...register("PhysicallyChallenged")} /> Yes</label>
+            <label><input type="radio" value="No"  {...register("PhysicallyChallenged")} /> No</label>
           </div>
-          {errors.PhysicallyChallenged && (
-            <p className="error-message">
-              {errors.PhysicallyChallenged.message}
-            </p>
-          )}
+          {errors.PhysicallyChallenged && <p className="error-message">{errors.PhysicallyChallenged.message as string}</p>}
         </section>
 
-        {/*Father's Section */}
+        {/* ── Father ── */}
         <section className="sub-section-container">
-          <h4>
-            Father's Name <CgAsterisk className="star-icon" />
-          </h4>
+          <h4>Father's Name <CgAsterisk className="star-icon" /></h4>
           <div className="sub-input-container-unique-2">
             <span>
               <select {...register("titleFather")}>
                 <option value=""></option>
                 {["Mr.", "Mrs.", "Miss.", "Dr.", "Prof.", "Rev."].map((opt) => (
-                  <option key={opt} value={opt}>
-                    {opt}
-                  </option>
+                  <option key={opt} value={opt}>{opt}</option>
                 ))}
               </select>
-              {errors.titleFather ? (
-                <p className="error-message">{errors.titleFather.message}</p>
-              ) : (
-                <h5>Title</h5>
-              )}
+              {errors.titleFather ? <p className="error-message">{errors.titleFather.message as string}</p> : <h5>Title</h5>}
             </span>
-
             <span>
-              <input
-                {...register("SurnameFather")}
-                placeholder=""
-                className={errors.SurnameFather ? "error-line" : ""}
-              />
-              {errors.SurnameFather ? (
-                <p className="error-message">{errors.SurnameFather.message}</p>
-              ) : (
-                <h5>Surname</h5>
-              )}
+              <input {...register("SurnameFather")} className={errors.SurnameFather ? "error-line" : ""} />
+              {errors.SurnameFather ? <p className="error-message">{errors.SurnameFather.message as string}</p> : <h5>Surname</h5>}
             </span>
-
             <span>
-              <input
-                {...register("firstNameFather")}
-                placeholder=""
-                className={errors.firstNameFather ? "error-line" : ""}
-              />
-              {errors.firstNameFather ? (
-                <p className="error-message">
-                  {errors.firstNameFather.message}
-                </p>
-              ) : (
-                <h5>First Name</h5>
-              )}
+              <input {...register("firstNameFather")} className={errors.firstNameFather ? "error-line" : ""} />
+              {errors.firstNameFather ? <p className="error-message">{errors.firstNameFather.message as string}</p> : <h5>First Name</h5>}
             </span>
           </div>
         </section>
-
         <div className="sub-input-container-unique">
-          {/* fatherAddress */}
           <section className="sub-section-container">
-            <h4>
-              Address <CgAsterisk className="star-icon" />
-            </h4>
-            <input
-              {...register("fatherAddress")}
-              placeholder=""
-              className={errors.fatherAddress ? "error-line" : ""}
-            />
-            {errors.fatherAddress && (
-              <p className="error-message">{errors.fatherAddress.message}</p>
-            )}
+            <h4>Address <CgAsterisk className="star-icon" /></h4>
+            <input {...register("fatherAddress")} className={errors.fatherAddress ? "error-line" : ""} />
+            {errors.fatherAddress && <p className="error-message">{errors.fatherAddress.message as string}</p>}
           </section>
-
-          {/* fatherPhoneNo */}
           <section className="sub-section-container">
-            <h4>
-              Phone Number <CgAsterisk className="star-icon" />
-            </h4>
-            <input
-              {...register("fatherPhoneNo")}
-              placeholder=""
-              className={errors.fatherPhoneNo ? "error-line" : ""}
-            />
-            {errors.fatherPhoneNo && (
-              <p className="error-message">{errors.fatherPhoneNo.message}</p>
-            )}
+            <h4>Phone Number <CgAsterisk className="star-icon" /></h4>
+            <input {...register("fatherPhoneNo")} className={errors.fatherPhoneNo ? "error-line" : ""} />
+            {errors.fatherPhoneNo && <p className="error-message">{errors.fatherPhoneNo.message as string}</p>}
           </section>
         </div>
 
-        {/* mother details section */}
+        {/* ── Mother ── */}
         <section className="sub-section-container">
-          <h4>
-            Mother's Name <CgAsterisk className="star-icon" />
-          </h4>
+          <h4>Mother's Name <CgAsterisk className="star-icon" /></h4>
           <div className="sub-input-container-unique-2">
             <span>
               <select {...register("titleMother")}>
                 <option value=""></option>
                 {["Mr.", "Mrs.", "Miss.", "Dr.", "Prof.", "Rev."].map((opt) => (
-                  <option key={opt} value={opt}>
-                    {opt}
-                  </option>
+                  <option key={opt} value={opt}>{opt}</option>
                 ))}
               </select>
-              {errors.titleMother ? (
-                <p className="error-message">{errors.titleMother.message}</p>
-              ) : (
-                <h5>Title</h5>
-              )}
+              {errors.titleMother ? <p className="error-message">{errors.titleMother.message as string}</p> : <h5>Title</h5>}
             </span>
-
             <span>
-              <input
-                {...register("SurnameMother")}
-                placeholder=""
-                className={errors.SurnameMother ? "error-line" : ""}
-              />
-              {errors.SurnameMother ? (
-                <p className="error-message">{errors.SurnameMother.message}</p>
-              ) : (
-                <h5>Surname</h5>
-              )}
+              <input {...register("SurnameMother")} className={errors.SurnameMother ? "error-line" : ""} />
+              {errors.SurnameMother ? <p className="error-message">{errors.SurnameMother.message as string}</p> : <h5>Surname</h5>}
             </span>
-
             <span>
-              <input
-                {...register("firstNameMother")}
-                placeholder=""
-                className={errors.firstNameMother ? "error-line" : ""}
-              />
-              {errors.firstNameMother ? (
-                <p className="error-message">
-                  {errors.firstNameMother.message}
-                </p>
-              ) : (
-                <h5>First Name</h5>
-              )}
+              <input {...register("firstNameMother")} className={errors.firstNameMother ? "error-line" : ""} />
+              {errors.firstNameMother ? <p className="error-message">{errors.firstNameMother.message as string}</p> : <h5>First Name</h5>}
             </span>
           </div>
         </section>
-
         <div className="sub-input-container-unique">
-          {/* motherAddress */}
           <section className="sub-section-container">
-            <h4>
-              Address <CgAsterisk className="star-icon" />
-            </h4>
-            <input
-              {...register("motherAddress")}
-              placeholder=""
-              className={errors.motherAddress ? "error-line" : ""}
-            />
-            {errors.motherAddress && (
-              <p className="error-message">{errors.motherAddress.message}</p>
-            )}
+            <h4>Address <CgAsterisk className="star-icon" /></h4>
+            <input {...register("motherAddress")} className={errors.motherAddress ? "error-line" : ""} />
+            {errors.motherAddress && <p className="error-message">{errors.motherAddress.message as string}</p>}
           </section>
-
-          {/* motherPhoneNo */}
           <section className="sub-section-container">
-            <h4>
-              Phone Number <CgAsterisk className="star-icon" />
-            </h4>
-            <input
-              {...register("motherPhoneNo")}
-              placeholder=""
-              className={errors.motherPhoneNo ? "error-line" : ""}
-            />
-            {errors.motherPhoneNo && (
-              <p className="error-message">{errors.motherPhoneNo.message}</p>
-            )}
+            <h4>Phone Number <CgAsterisk className="star-icon" /></h4>
+            <input {...register("motherPhoneNo")} className={errors.motherPhoneNo ? "error-line" : ""} />
+            {errors.motherPhoneNo && <p className="error-message">{errors.motherPhoneNo.message as string}</p>}
           </section>
-
-          {/* spouse details section */}
         </div>
 
-{maritalStatus==='Married' &&
-(
-  <>
-   {/* spouse details section */}
-        <section className="sub-section-container">
-          <h4>
-            Spouse's Name <CgAsterisk className="star-icon" />
-          </h4>
-          <div className="sub-input-container-unique-2">
-            <span>
-              <select {...register("titleSpouse")}>
-                <option value=""></option>
-                {["Mr.", "Mrs.", "Miss.", "Dr.", "Prof.", "Rev."].map((opt) => (
-                  <option key={opt} value={opt}>
-                    {opt}
-                  </option>
-                ))}
-              </select>
-              {errors.titleSpouse ? (
-                <p className="error-message">{errors.titleSpouse.message}</p>
-              ) : (
-                <h5>Title</h5>
-              )}
-            </span>
-
-            <span>
-              <input
-                {...register("SurnameSpouse")}
-                placeholder=""
-                className={errors.SurnameSpouse ? "error-line" : ""}
-              />
-              {errors.SurnameSpouse ? (
-                <p className="error-message">{errors.SurnameSpouse.message}</p>
-              ) : (
-                <h5>Surname</h5>
-              )}
-            </span>
-
-            <span>
-              <input
-                {...register("firstNameSpouse")}
-                placeholder=""
-                className={errors.firstNameSpouse ? "error-line" : ""}
-              />
-              {errors.firstNameSpouse ? (
-                <p className="error-message">
-                  {errors.firstNameSpouse.message}
-                </p>
-              ) : (
-                <h5>First Name</h5>
-              )}
-            </span>
-          </div>
-        </section>
-
-        <div className="sub-input-container-unique">
-          {/* spouseAddress */}
-          <section className="sub-section-container">
-            <h4>
-              Address <CgAsterisk className="star-icon" />
-            </h4>
-            <input
-              {...register("spouseAddress")}
-              placeholder=""
-              className={errors.spouseAddress ? "error-line" : ""}
-            />
-            {errors.spouseAddress && (
-              <p className="error-message">{errors.spouseAddress.message}</p>
-            )}
-          </section>
-
-          {/* spousePhoneNo */}
-          <section className="sub-section-container">
-            <h4>
-              Phone Number <CgAsterisk className="star-icon" />
-            </h4>
-            <input
-              {...register("spousePhoneNo")}
-              placeholder=""
-              className={errors.spousePhoneNo ? "error-line" : ""}
-            />
-            {errors.spousePhoneNo && (
-              <p className="error-message">{errors.spousePhoneNo.message}</p>
-            )}
-          </section>
-        </div>
-  </>
-)       
-}
+        {/* ── Spouse (only when Married) ── */}
+        {maritalStatus === "Married" && (
+          <>
+            <section className="sub-section-container">
+              <h4>Spouse's Name <CgAsterisk className="star-icon" /></h4>
+              <div className="sub-input-container-unique-2">
+                <span>
+                  <select {...register("titleSpouse")}>
+                    <option value=""></option>
+                    {["Mr.", "Mrs.", "Miss.", "Dr.", "Prof.", "Rev."].map((opt) => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                  {errors.titleSpouse ? <p className="error-message">{errors.titleSpouse.message as string}</p> : <h5>Title</h5>}
+                </span>
+                <span>
+                  <input {...register("SurnameSpouse")} className={errors.SurnameSpouse ? "error-line" : ""} />
+                  {errors.SurnameSpouse ? <p className="error-message">{errors.SurnameSpouse.message as string}</p> : <h5>Surname</h5>}
+                </span>
+                <span>
+                  <input {...register("firstNameSpouse")} className={errors.firstNameSpouse ? "error-line" : ""} />
+                  {errors.firstNameSpouse ? <p className="error-message">{errors.firstNameSpouse.message as string}</p> : <h5>First Name</h5>}
+                </span>
+              </div>
+            </section>
+            <div className="sub-input-container-unique">
+              <section className="sub-section-container">
+                <h4>Address <CgAsterisk className="star-icon" /></h4>
+                <input {...register("spouseAddress")} className={errors.spouseAddress ? "error-line" : ""} />
+                {errors.spouseAddress && <p className="error-message">{errors.spouseAddress.message as string}</p>}
+              </section>
+              <section className="sub-section-container">
+                <h4>Phone Number <CgAsterisk className="star-icon" /></h4>
+                <input {...register("spousePhoneNo")} className={errors.spousePhoneNo ? "error-line" : ""} />
+                {errors.spousePhoneNo && <p className="error-message">{errors.spousePhoneNo.message as string}</p>}
+              </section>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

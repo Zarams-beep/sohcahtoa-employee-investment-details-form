@@ -47,7 +47,8 @@ export default function PreviewModal({
                 <strong>Name:</strong> {data.firstName} {data.Surname}
               </p>
               <p>
-                <strong>Date:</strong> {data.date}
+                <strong>Date:</strong>{" "}
+                {data.date ? (() => { const d = new Date(data.date + 'T00:00:00'); return isNaN(d.getTime()) ? data.date : d.toLocaleDateString('en-GB'); })() : ''}
               </p>
               <p>
                 <strong>Signature:</strong>

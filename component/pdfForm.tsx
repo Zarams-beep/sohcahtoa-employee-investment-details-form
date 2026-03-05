@@ -47,7 +47,7 @@ export default function PDFTemplate({ data }: PDFTemplateProps) {
         fontSize: '11pt',
       }}
     >
-      <h1>SOHCAHTOA HOLDINGS LIMITED - EMPLOYEE DETAILS FORM</h1>
+      <h1>SOHCAHTOA INVESTMENT LIMITED - EMPLOYEE DETAILS FORM</h1>
 
       {/* PAGE 1 */}
       <div style={{ pageBreakAfter: "always" }} className="pdf-page"> 
@@ -130,7 +130,7 @@ export default function PDFTemplate({ data }: PDFTemplateProps) {
             </div>
             <div className="pdf-sub-section-container">
               <h4>Start Date</h4>
-              <div className="pdf-input">{data.startDate}</div>
+              <div className="pdf-input">{(() => { const _d = data.startDate ? new Date(data.startDate + 'T00:00:00') : null; return _d && !isNaN(_d.getTime()) ? `${String(_d.getDate()).padStart(2,'0')}/${String(_d.getMonth()+1).padStart(2,'0')}/${_d.getFullYear()}` : (data.startDate || ''); })()}</div>
             </div>
             <div className="pdf-sub-section-container">
               <h4>Current Address</h4>
@@ -161,7 +161,7 @@ export default function PDFTemplate({ data }: PDFTemplateProps) {
             <div className="main-input-pdf-container">
               <div className="pdf-sub-section-container">
               <h4>DOB</h4>
-              <div className="pdf-input">{data.DOB}</div>
+              <div className="pdf-input">{(() => { const _d = data.DOB ? new Date(data.DOB + 'T00:00:00') : null; return _d && !isNaN(_d.getTime()) ? `${String(_d.getDate()).padStart(2,'0')}/${String(_d.getMonth()+1).padStart(2,'0')}/${_d.getFullYear()}` : (data.DOB || ''); })()}</div>
             </div>
             <div className="pdf-sub-section-container">
               <h4>Age</h4>
@@ -417,8 +417,8 @@ export default function PDFTemplate({ data }: PDFTemplateProps) {
                     <tr key={index}>
                       <td style={{ border: '1px solid #ddd', padding: '6px' }}>{sch.nameOfInstitution}</td>
                       <td style={{ border: '1px solid #ddd', padding: '6px' }}>{sch.degreeObtained}</td>
-                      <td style={{ border: '1px solid #ddd', padding: '6px' }}>{sch.from}</td>
-                      <td style={{ border: '1px solid #ddd', padding: '6px' }}>{sch.to}</td>
+                      <td style={{ border: '1px solid #ddd', padding: '6px' }}>{(() => { const _d = sch.from ? new Date(sch.from + 'T00:00:00') : null; return _d && !isNaN(_d.getTime()) ? `${String(_d.getDate()).padStart(2,'0')}/${String(_d.getMonth()+1).padStart(2,'0')}/${_d.getFullYear()}` : (sch.from || ''); })()}</td>
+                      <td style={{ border: '1px solid #ddd', padding: '6px' }}>{(() => { const _d = sch.to ? new Date(sch.to + 'T00:00:00') : null; return _d && !isNaN(_d.getTime()) ? `${String(_d.getDate()).padStart(2,'0')}/${String(_d.getMonth()+1).padStart(2,'0')}/${_d.getFullYear()}` : (sch.to || ''); })()}</td>
                       <td style={{ border: '1px solid #ddd', padding: '6px' }}>{sch.grade}</td>
                     </tr>
                   ))}
@@ -493,8 +493,8 @@ export default function PDFTemplate({ data }: PDFTemplateProps) {
                     <tr key={index}>
                       <td style={{ border: '1px solid #ddd', padding: '5px' }}>{emp.company}</td>
                       <td style={{ border: '1px solid #ddd', padding: '5px' }}>{emp.address}</td>
-                      <td style={{ border: '1px solid #ddd', padding: '5px' }}>{emp.from}</td>
-                      <td style={{ border: '1px solid #ddd', padding: '5px' }}>{emp.to}</td>
+                      <td style={{ border: '1px solid #ddd', padding: '5px' }}>{(() => { const _d = emp.from ? new Date(emp.from + 'T00:00:00') : null; return _d && !isNaN(_d.getTime()) ? `${String(_d.getDate()).padStart(2,'0')}/${String(_d.getMonth()+1).padStart(2,'0')}/${_d.getFullYear()}` : (emp.from || ''); })()}</td>
+                      <td style={{ border: '1px solid #ddd', padding: '5px' }}>{(() => { const _d = emp.to ? new Date(emp.to + 'T00:00:00') : null; return _d && !isNaN(_d.getTime()) ? `${String(_d.getDate()).padStart(2,'0')}/${String(_d.getMonth()+1).padStart(2,'0')}/${_d.getFullYear()}` : (emp.to || ''); })()}</td>
                       <td style={{ border: '1px solid #ddd', padding: '5px' }}>{emp.durationOfService}</td>
                       <td style={{ border: '1px solid #ddd', padding: '5px' }}>{emp.designation}</td>
                     </tr>
@@ -593,7 +593,7 @@ export default function PDFTemplate({ data }: PDFTemplateProps) {
               minHeight: '30px',
               minWidth: '150px'
             }}>
-              {data.date}
+              {(() => { const _d = data.date ? new Date(data.date + 'T00:00:00') : null; return _d && !isNaN(_d.getTime()) ? `${String(_d.getDate()).padStart(2,'0')}/${String(_d.getMonth()+1).padStart(2,'0')}/${_d.getFullYear()}` : (data.date || ''); })()}
             </div>
           </div>
           

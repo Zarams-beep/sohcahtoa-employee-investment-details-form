@@ -1,23 +1,23 @@
 import { z } from "zod";
+import { dateSchema } from "./dateSchema";
 
 const schoolRow = z.object({
   nameOfInstitution: z.string().trim().min(3, "Institution name is required"),
   degreeObtained: z.string().trim().min(3, "Degree is required"),
-  from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Use YYYY-MM-DD"),
-  to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Use YYYY-MM-DD"),
+  from: dateSchema,
+  to: dateSchema,
   grade: z.string().trim().min(3, "Grade is required"),
 }).refine(
   (data) => {
     if (!data.from || !data.to) return true;
-    return new Date(data.from) <= new Date(data.to);
+    return data.from <= data.to;
   },
-  {
-    message: "Start date cannot be after end date",
-    path: ["from"],
-  }
+  { message: "Start date cannot be after end date", path: ["to"] }
 );
 
-// allow user to add multiple schools but ignore empty rows
+// Accept rows as loose objects, filter blanks, then validate filled rows.
+// Using superRefine instead of chained .transform().refine() so the array
+// output type stays known to TypeScript (transform+refine → unknown).
 const schoolArray = z
   .array(
     z.object({
@@ -28,30 +28,39 @@ const schoolArray = z
       grade: z.string().optional(),
     })
   )
-  .transform(rows =>
-    // keep only rows where at least one field is filled
-    rows.filter(
-      r =>
-        r.nameOfInstitution ||
-        r.degreeObtained ||
-        r.from ||
-        r.to ||
-        r.grade
-    )
-  )
-  .refine(rows => rows.length > 0, {
-    message: "Please provide at least one complete school entry",
+  .superRefine((rows, ctx) => {
+    const filled = rows.filter(
+      (r) => r.nameOfInstitution || r.degreeObtained || r.from || r.to || r.grade
+    );
+    if (filled.length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Please provide at least one complete school entry",
+      });
+      return;
+    }
+    filled.forEach((r, i) => {
+      const result = schoolRow.safeParse(r);
+      if (!result.success) {
+        result.error.issues.forEach((issue) => {
+          ctx.addIssue({
+            ...issue,
+            path: [i, ...(issue.path ?? [])],
+          });
+        });
+      }
+    });
   })
-  .refine(
-    rows => rows.every(r => schoolRow.safeParse(r).success),
-    { message: "Each filled school entry must have all fields valid and dates in correct order" }
+  .transform((rows) =>
+    rows.filter(
+      (r) => r.nameOfInstitution || r.degreeObtained || r.from || r.to || r.grade
+    )
   );
 
-// professional rows
 const professionalRow = z.object({
   certification: z.string().trim().min(1, "Certification is required"),
   award: z.string().trim().min(1, "Award is required"),
-  year: z.string(),
+  year: z.string().min(1, "Year is required"),
 });
 
 const professionalArray = z
@@ -62,23 +71,30 @@ const professionalArray = z
       year: z.string().optional(),
     })
   )
-  .transform(rows =>
-    // keep only rows where at least one field is filled
-    rows.filter(
-      p =>
-        p.certification ||
-        p.award ||
-        p.year
-    )
-  )
-  .refine(rows => rows.length > 0, {
-    message: "Please provide at least one complete professional entry",
+  .superRefine((rows, ctx) => {
+    const filled = rows.filter((r) => r.certification || r.award || r.year);
+    if (filled.length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Please provide at least one complete professional entry",
+      });
+      return;
+    }
+    filled.forEach((r, i) => {
+      const result = professionalRow.safeParse(r);
+      if (!result.success) {
+        result.error.issues.forEach((issue) => {
+          ctx.addIssue({
+            ...issue,
+            path: [i, ...(issue.path ?? [])],
+          });
+        });
+      }
+    });
   })
-  .refine(
-    rows => rows.every(r => professionalRow.safeParse(r).success),
-    { message: "Each filled professional entry must have all fields valid" }
+  .transform((rows) =>
+    rows.filter((r) => r.certification || r.award || r.year)
   );
-
 
 export const fourthStage = z.object({
   school: schoolArray,

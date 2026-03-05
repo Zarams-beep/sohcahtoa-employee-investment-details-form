@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { dateSchema } from "./dateSchema";
 
 export const firstStage = z.object({
   contractType: z.enum(["Full Time", "Part Time", "Intern", "Other"]),
@@ -11,10 +12,7 @@ export const firstStage = z.object({
   jobTitle: z.string().min(3, "Job title is required"),
   department: z.string().min(3, "Enter your department please"),
   location: z.string().min(1, "Enter your location please"),
-  startDate: z
-    .string()
-    .min(1, "Date is required")
-    .regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format (YYYY-MM-DD)"),
+  startDate: dateSchema,
   currentAddress: z.string().min(5, "Enter your current address please"),
   permanentAddress: z.string().min(5, "Enter your permanent address please"),
   phoneNo: z

@@ -1,116 +1,37 @@
+"use client";
 import { useEffect } from "react";
-import {
-  useFieldArray,
-  useFormContext,
-  useWatch,
-} from "react-hook-form";
+import { useFieldArray, useFormContext, useWatch } from "react-hook-form";
 import { CgAsterisk } from "react-icons/cg";
 import { FullFormType } from "@/schema/formSchema";
 
-interface EmploymentHistoryTableProps {
-  name?: "employmentHistory";
-}
+export default function EmploymentHistoryTable() {
+  const name = "employmentHistory" as const;
 
-export default function EmploymentHistoryTable({
-  name = "employmentHistory",
-}: EmploymentHistoryTableProps) {
   const {
     control,
     register,
-    setError,
-    clearErrors,
-    formState: { errors },
+    formState: { errors, isSubmitted },
   } = useFormContext<FullFormType>();
 
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name,
-  });
+  const { fields, append, remove } = useFieldArray({ control, name });
 
-  // Ensure at least one empty row on mount
   useEffect(() => {
     if (fields.length === 0) {
-      append({
-        company: "",
-        address: "",
-        from: "",
-        to: "",
-        durationOfService: "",
-        designation: "",
-      });
+      append({ company: "", address: "", from: "", to: "", durationOfService: "", designation: "" });
     }
-  }, [fields, append]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  // 🔑 Watch all employment history rows
-  const jobs = useWatch({
-    control,
-    name,
-  }) as
-    | {
-        company: string;
-        address: string;
-        from: string;
-        to: string;
-        durationOfService: string;
-        designation: string;
-      }[]
-    | undefined;
-
-  // ✅ Ignore rows that are completely empty
-  const activeRows =
-    jobs?.filter(
-      (j) =>
-        j.company ||
-        j.address ||
-        j.from ||
-        j.to ||
-        j.durationOfService ||
-        j.designation
-    ) || [];
-
-  // ✅ Check if a job row has valid date range
-  const isValidDateRange = (from: string, to: string): boolean => {
-    if (!from || !to) return true; // allow empty dates
-    return new Date(from) <= new Date(to);
-  };
-
-  // ✅ Mark as incomplete if any required field is missing or date range is invalid
-  const someRowIncomplete =
-    activeRows.length > 0 &&
-    activeRows.some(
-      (j) =>
-        !j.company ||
-        !j.address ||
-        !j.from ||
-        !j.to ||
-        !j.durationOfService ||
-        !j.designation ||
-        !isValidDateRange(j.from, j.to)
-    );
-
-  // ✅ Dynamically set / clear global error
-  useEffect(() => {
-    if (someRowIncomplete) {
-      setError(name, {
-        type: "manual",
-        message: "Please fill all employment history fields and ensure start date is not after end date",
-      });
-    } else {
-      clearErrors(name);
-    }
-  }, [someRowIncomplete, setError, clearErrors, name]);
+  const jobs = useWatch({ control, name }) as {
+    company: string; address: string; from: string;
+    to: string; durationOfService: string; designation: string;
+  }[] | undefined;
 
   return (
     <div className="table-container">
       <h4>
-        Employment History
-        <CgAsterisk className="star-icon" />
+        Employment History <CgAsterisk className="star-icon" />
       </h4>
-
-      {/* Info notification about date range requirement */}
-      <div className="info-notification">
-        ℹ️ Please provide both <strong>From</strong> and <strong>To</strong> dates for each employment. The start date must not be after the end date.
-      </div>
 
       <div className="table-sub-container">
         <table>
@@ -119,62 +40,56 @@ export default function EmploymentHistoryTable({
               <th>#</th>
               <th className="tr-showing-part">Company</th>
               <th className="tr-showing-part">Address</th>
-              <th className="tr-showing-part">From <span style={{ fontSize: "11px", color: "#666" }}>(start)</span></th>
-              <th className="tr-showing-part">To <span style={{ fontSize: "11px", color: "#666" }}>(end)</span></th>
+              <th className="tr-showing-part">From</th>
+              <th className="tr-showing-part">To</th>
               <th className="tr-showing-part">Duration of Service</th>
               <th className="tr-showing-part">Designation</th>
             </tr>
           </thead>
           <tbody>
-            {fields.map((field, rowIndex) => (
-              <tr key={field.id}>
-                <td className="tr-showing-part">{rowIndex + 1}</td>
-
-                <td className="tbody-side">
-                  <input
-                    {...register(`${name}.${rowIndex}.company`)}
-                    placeholder="Name of Company"
-                  />
-                </td>
-                <td className="tbody-side">
-                  <input
-                    {...register(`${name}.${rowIndex}.address`)}
-                    placeholder="Address"
-                  />
-                </td>
-                <td className="tbody-side">
-                  <input
-                    {...register(`${name}.${rowIndex}.from`)}
-                    type="date"
-                  />
-                </td>
-                <td className="tbody-side">
-                  <input
-                    {...register(`${name}.${rowIndex}.to`)}
-                    type="date"
-                  />
-                </td>
-                <td className="tbody-side">
-                  <input
-                    {...register(`${name}.${rowIndex}.durationOfService`)}
-                    type="number"
-                    placeholder="Months / Years"
-                  />
-                </td>
-                <td className="tbody-side">
-                  <input
-                    {...register(`${name}.${rowIndex}.designation`)}
-                    placeholder="Designation"
-                  />
-                </td>
-              </tr>
-            ))}
+            {fields.map((field, rowIndex) => {
+              const row = jobs?.[rowIndex];
+              const hasInvalidDates = row?.from && row?.to && row.from > row.to;
+              return (
+                <tr
+                  key={field.id}
+                  style={hasInvalidDates ? { backgroundColor: "#ffe6e6" } : {}}
+                >
+                  <td className="tr-showing-part">{rowIndex + 1}</td>
+                  <td className="tbody-side">
+                    <input {...register(`${name}.${rowIndex}.company`)} placeholder="Name of Company" />
+                  </td>
+                  <td className="tbody-side">
+                    <input {...register(`${name}.${rowIndex}.address`)} placeholder="Address" />
+                  </td>
+                  <td className="tbody-side">
+                    <input
+                      {...register(`${name}.${rowIndex}.from`)}
+                      type="date"
+                      style={hasInvalidDates ? { borderColor: "#dc2626", borderWidth: "2px" } : {}}
+                    />
+                  </td>
+                  <td className="tbody-side">
+                    <input
+                      {...register(`${name}.${rowIndex}.to`)}
+                      type="date"
+                      style={hasInvalidDates ? { borderColor: "#dc2626", borderWidth: "2px" } : {}}
+                    />
+                  </td>
+                  <td className="tbody-side">
+                    <input {...register(`${name}.${rowIndex}.durationOfService`)} type="number" placeholder="Months / Years" />
+                  </td>
+                  <td className="tbody-side">
+                    <input {...register(`${name}.${rowIndex}.designation`)} placeholder="Designation" />
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
 
-      {/* ✅ Show the global RHF error */}
-      {errors.employmentHistory && (
+      {isSubmitted && errors.employmentHistory && (
         <p className="error-message text-center">
           {errors.employmentHistory.message as string}
         </p>
@@ -184,24 +99,12 @@ export default function EmploymentHistoryTable({
         <button
           type="button"
           className="table-add-btn"
-          onClick={() =>
-            append({
-              company: "",
-              address: "",
-              from: "",
-              to: "",
-              durationOfService: "",
-              designation: "",
-            })
-          }
+          onClick={() => append({ company: "", address: "", from: "", to: "", durationOfService: "", designation: "" })}
         >
           +
         </button>
-        {fields.length > 4 && (
-          <button
-            type="button"
-            onClick={() => remove(fields.length - 1)}
-          >
+        {fields.length > 1 && (
+          <button type="button" onClick={() => remove(fields.length - 1)}>
             –
           </button>
         )}
